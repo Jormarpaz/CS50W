@@ -20,6 +20,16 @@ CS50W is an intensive course that dives into the world of web programming. It co
 - **Database Management**: Gain proficiency in SQL and database design principles.
 - **Web Security**: Explore best practices for securing web applications against common vulnerabilities.
 
+## Getting Started
+
+To get started with the course, make sure you have the following installed:
+
+1. **Python**: Download and install the latest version from [python.org](https://www.python.org/).
+2. **Git**: Download and install Git from [git-scm.com](https://git-scm.com/).
+3. **VS Code**: Download and install Visual Studio Code from [code.visualstudio.com](https://code.visualstudio.com/).
+
+Happy coding!
+
 ## Conclusion
 
 By the end of the course, students will have a solid foundation in web programming and the skills necessary to build full-stack web applications.
