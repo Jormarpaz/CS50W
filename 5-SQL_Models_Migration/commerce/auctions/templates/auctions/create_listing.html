@@ -1,0 +1,78 @@
+{% extends "auctions/layout.html" %} {% block body %}
+
+<h2>Create Listing</h2>
+
+<form class="create" action="{% url 'create_listing' %}" method="post">
+  {% csrf_token %}
+  <input autocomplete="off" type="text" name="title" id="title" placeholder="Title" />
+  <input
+    autocomplete="off"
+    type="text"
+    name="description"
+    id="description"
+    placeholder="Description"
+  />
+  <input
+    autocomplete="off"
+    type="number"
+    name="price"
+    id="price"
+    step="0.01"
+    placeholder="Starting Bid"
+  />
+  <input
+    autocomplete="off"
+    type="text"
+    name="image"
+    id="image-url"
+    placeholder="Image URL"
+  />
+  <input
+    autocomplete="off"
+    type="text"
+    name="category"
+    id="category"
+    placeholder="Category"
+  />
+  <button type="submit" class="btn btn-primary">Create Listing</button>
+</form>
+
+<div class="preview">
+    <img
+      id="image-preview"
+      style="display: none; max-width: 200px; margin-left: 20px"
+    />
+    <div class="preview-texto">
+        <h3 id="preview-title"></h3>
+        <p id="preview-description"></p>
+        <p id="preview-price"></p>
+    </div>
+  </div>
+
+<script>
+  document.getElementById("title").addEventListener("input", function () {
+    document.getElementById("preview-title").textContent = this.value;
+  });
+
+  document.getElementById("description").addEventListener("input", function () {
+    document.getElementById("preview-description").textContent = this.value;
+  });
+
+  document.getElementById("price").addEventListener("input", function () {
+    document.getElementById("preview-price").textContent =
+      "Starting Bid: $" + this.value;
+  });
+
+  document.getElementById("image-url").addEventListener("input", function () {
+    var imageUrl = this.value;
+    var imagePreview = document.getElementById("image-preview");
+    if (imageUrl) {
+      imagePreview.src = imageUrl;
+      imagePreview.style.display = "block";
+    } else {
+      imagePreview.style.display = "none";
+    }
+  });
+</script>
+
+{% endblock %}
