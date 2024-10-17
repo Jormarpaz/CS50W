@@ -7,11 +7,17 @@
 
     <script>
         function hello() {
-            alert("Hello, world!");
+            let heading = document.querySelector("h1"); // Puede ser una variable (let) o una constante (const)
+            if (heading.innerHTML === "Hello, world!"){
+                heading.innerHTML = "Goodbye, world!";
+            } else {
+                heading.innerHTML = "Hello, world!";
+            }
         }
     </script>
 </head>
 <body>
     <h1>Hello, world!</h1>
+    <button onclick="hello()">Click here</button>
 </body>
 </html>
