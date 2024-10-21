@@ -4,23 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Counter</title>
-    <script>
-        let counter = 0;
-        function increment() {
-            counter++;
-            document.querySelector("h1").innerHTML = counter;
-
-            if(counter % 10 === 0) {
-                alert(`Counter is now ${counter}`);
-            }
-        }
-        
-        
-        document.addEventListener("DOMContentLoaded", function() {
-            document.querySelector("button").onclick = increment;
-        })
-
-    </script>
+    <script src="counter.js" defer></script>
 </head>
 <body>
     <h1>0</h1>
