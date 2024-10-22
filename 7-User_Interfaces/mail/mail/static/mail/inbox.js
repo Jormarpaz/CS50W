@@ -1,4 +1,8 @@
+console.log('inbox.js loaded');
+
 document.addEventListener('DOMContentLoaded', function() {
+  console.log('DOM fully loaded and parsed');
+  
   // Use buttons to toggle between views
   document.querySelector('#inbox').addEventListener('click', () => load_mailbox('inbox'));
   document.querySelector('#sent').addEventListener('click', () => load_mailbox('sent'));
@@ -13,6 +17,8 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 
 function compose_email() {
+  console.log('Composing new email');
+  
   // Show compose view and hide other views
   document.querySelector('#emails-view').style.display = 'none';
   document.querySelector('#compose-view').style.display = 'block';
@@ -31,22 +37,42 @@ function send_email(event) {
   const subject = document.querySelector('#compose-subject').value;
   const body = document.querySelector('#compose-body').value;
 
+  console.log('Sending email:', { recipients, subject, body });
+
   fetch('/emails', {
     method: 'POST',
     body: JSON.stringify({
       recipients: recipients,
       subject: subject,
       body: body
-    })
+    }),
+    headers: {
+      'Content-Type': 'application/json'
+    }
   })
-  .then(response => response.json())
+  .then(response => {
+    if (!response.ok) {
+      return response.json().then(error => { throw new Error(error.error); });
+    }
+    return response.json();
+  })
   .then(result => {
-    // Load the sent mailbox after sending the email
-    load_mailbox('sent');
+    console.log('Email sent result:', result);
+    if (result.error) {
+      console.log(result.error);
+    } else {
+      // Load the sent mailbox after sending the email
+      load_mailbox('sent');
+    }
+  })
+  .catch(error => {
+    console.error('Error:', error);
   });
 }
 
 function load_mailbox(mailbox) {
+  console.log(`Loading mailbox: ${mailbox}`);
+  
   // Show the mailbox and hide other views
   document.querySelector('#emails-view').style.display = 'block';
   document.querySelector('#compose-view').style.display = 'none';
@@ -59,6 +85,7 @@ function load_mailbox(mailbox) {
   fetch(`/emails/${mailbox}`)
   .then(response => response.json())
   .then(emails => {
+    console.log('Emails:', emails);
     emails.forEach(email => {
       const emailDiv = document.createElement('div');
       emailDiv.className = 'email';
@@ -75,6 +102,8 @@ function load_mailbox(mailbox) {
 }
 
 function view_email(email_id) {
+  console.log(`Viewing email: ${email_id}`);
+  
   // Show the email view and hide other views
   document.querySelector('#emails-view').style.display = 'none';
   document.querySelector('#compose-view').style.display = 'none';
@@ -84,6 +113,7 @@ function view_email(email_id) {
   fetch(`/emails/${email_id}`)
   .then(response => response.json())
   .then(email => {
+    console.log('Email details:', email);
     document.querySelector('#email-view').innerHTML = `
       <div><strong>From:</strong> ${email.sender}</div>
       <div><strong>To:</strong> ${email.recipients.join(', ')}</div>
@@ -100,7 +130,10 @@ function view_email(email_id) {
       method: 'PUT',
       body: JSON.stringify({
         read: true
-      })
+      }),
+      headers: {
+        'Content-Type': 'application/json'
+      }
     });
 
     // Archive/Unarchive email
@@ -109,7 +142,10 @@ function view_email(email_id) {
         method: 'PUT',
         body: JSON.stringify({
           archived: !email.archived
-        })
+        }),
+        headers: {
+          'Content-Type': 'application/json'
+        }
       })
       .then(() => load_mailbox('inbox'));
     });
