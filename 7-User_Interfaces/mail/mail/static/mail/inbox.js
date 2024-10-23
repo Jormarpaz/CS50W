@@ -86,18 +86,31 @@ function load_mailbox(mailbox) {
   .then(response => response.json())
   .then(emails => {
     console.log('Emails:', emails);
+
+    if (emails.length === 0) {
+      document.querySelector('#emails-view').innerHTML += '<div>No emails to show.</div>';
+    } else {
     emails.forEach(email => {
       const emailDiv = document.createElement('div');
       emailDiv.className = 'email';
       emailDiv.innerHTML = `
-        <div><strong>${email.sender}</strong></div>
+        <div style="display: flex; justify-content: space-between;">
+          <div><strong>${email.sender}</strong></div>
+          <div>${email.timestamp}</div>
+        </div>
         <div>${email.subject}</div>
-        <div>${email.timestamp}</div>
       `;
-      emailDiv.style.backgroundColor = email.read ? 'gray' : 'white';
+      //First case is for read emails, second case is for unread emails
+      emailDiv.style.backgroundColor = email.read ? 'lightgray' : 'white';
+      emailDiv.style.color = email.read ? 'white' : 'lightgray';
+      emailDiv.style.border = email.read ? '1px groove lightgray' : '1px groove black';
+      emailDiv.style.padding = '10px';
+      emailDiv.style.borderRadius = '15px';
       emailDiv.addEventListener('click', () => view_email(email.id));
       document.querySelector('#emails-view').append(emailDiv);
-    });
+      emailDiv.style.marginBottom = '5px';
+      });
+    }
   });
 }
 
@@ -119,10 +132,14 @@ function view_email(email_id) {
       <div><strong>To:</strong> ${email.recipients.join(', ')}</div>
       <div><strong>Subject:</strong> ${email.subject}</div>
       <div><strong>Timestamp:</strong> ${email.timestamp}</div>
+      <button id="archive" class="btn btn-sm btn-outline-primary" style=" margin-top: 5px; margin-right: 5px; ">
+      ${email.archived ? 'Unarchive' : 'Archive'}
+      </button>
+      <button id="reply" class="btn btn-sm btn-outline-primary" style=" margin-top: 5px; ">
+      Reply
+      </button>
       <hr>
       <div>${email.body}</div>
-      <button id="archive">${email.archived ? 'Unarchive' : 'Archive'}</button>
-      <button id="reply">Reply</button>
     `;
 
     // Mark the email as read
