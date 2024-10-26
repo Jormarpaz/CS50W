@@ -1,14 +1,39 @@
 from django.contrib.auth import authenticate, login, logout
+from django.contrib.auth.decorators import login_required
 from django.db import IntegrityError
-from django.http import HttpResponse, HttpResponseRedirect
-from django.shortcuts import render
+from django.http import HttpResponse, HttpResponseRedirect, JsonResponse
+from django.shortcuts import render, redirect, get_object_or_404
 from django.urls import reverse
 
-from .models import User
+from .models import User, Post, Like, Follow
 
 
 def index(request):
+    posts = Post.objects.all().order_by("-timestamp")
     return render(request, "network/index.html")
+
+@login_required
+def new_post(request):
+    if request.method == "POST":
+        content = request.POST["content"]
+        post = Post(user=request.user, content=content)
+        post.save()
+        return redirect("index")
+    return render(request, "network/new_post.html")
+
+def profile(request, username):
+    user = get_object_or_404(User, username=username)
+    posts = user.posts.all().order_by("-timestamp")
+    followers = user.followers.count()
+    following = user.following.count()
+    is_following = Follow.objects.filter(follower=request.user, following=user).exists()
+    return render(request, "network/profile.html", {
+        "profile_user": user,
+        "posts": posts,
+        "followers": followers,
+        "following": following,
+        "is_following": is_following
+    })
 
 
 def login_view(request):
