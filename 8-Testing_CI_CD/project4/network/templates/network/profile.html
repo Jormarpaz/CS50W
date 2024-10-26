@@ -1,0 +1,33 @@
+{% extends "network/layout.html" %}
+{% block body %}
+    <h2>{{ profile_user.username }}</h2>
+    <p>Followers: {{ followers }}</p>
+    <p>Following: {{ following }}</p>
+    {% if user != profile_user %}
+        <button id="follow-button" data-username="{{ profile_user.username }}">
+            {% if is_following %}
+                Unfollow
+            {% else %}
+                Follow
+            {% endif %}
+        </button>
+    {% endif %}
+    <h3>Posts</h3>
+    {% for post in posts %}
+        <div class="post">
+            <p>{{ post.content }}</p>
+            <p>{{ post.timestamp }}</p>
+            <p>Likes: {{ post.likes.count }}</p>
+            <button class="like-button" data-post-id="{{ post.id }}">
+                {% if user in post.likes.all %}
+                    Unlike
+                {% else %}
+                    Like
+                {% endif %}
+            </button>
+            {% if post.user == user %}
+                <button class="edit-button" data-post-id="{{ post.id }}">Edit</button>
+            {% endif %}
+        </div>
+    {% endfor %}
+{% endblock %}

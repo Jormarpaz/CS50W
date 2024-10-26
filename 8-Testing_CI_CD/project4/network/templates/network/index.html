@@ -1,5 +1,23 @@
-{% extends "network/layout.html" %}
-
-{% block body %}
-    TODO
+{% extends "network/layout.html" %} {% block body %}
+<h2>All Posts</h2>
+{% for post in page_obj %}
+<div class="post">
+  <p>{{ post.user.username }}: {{ post.content }}</p>
+  <p>{{ post.timestamp }}</p>
+  <p>Likes: {{ post.likes.count }}</p>
+  <button class="like-button" data-post-id="{{ post.id }}">
+    {% if user in post.likes.all %} Unlike {% else %} Like {% endif %}
+  </button>
+  {% if post.user == user %}
+  <button class="edit-button" data-post-id="{{ post.id }}">Edit</button>
+  {% endif %}
+</div>
+{% endfor %}
+<div class="pagination">
+  {% if page_obj.has_previous %}
+  <a href="?page={{ page_obj.previous_page_number }}">Previous</a>
+  {% endif %} {% if page_obj.has_next %}
+  <a href="?page={{ page_obj.next_page_number }}">Next</a>
+  {% endif %}
+</div>
 {% endblock %}

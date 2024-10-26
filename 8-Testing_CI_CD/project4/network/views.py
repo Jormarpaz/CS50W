@@ -4,6 +4,7 @@ from django.db import IntegrityError
 from django.http import HttpResponse, HttpResponseRedirect, JsonResponse
 from django.shortcuts import render, redirect, get_object_or_404
 from django.urls import reverse
+from django.core.paginator import Paginator
 
 from .models import User, Post, Like, Follow
 
@@ -35,6 +36,47 @@ def profile(request, username):
         "is_following": is_following
     })
 
+@login_required
+def follow(request, username):
+    user_to_follow = get_object_or_404(User, username=username)
+    if Follow.objects.filter(follower=request.user, following=user_to_follow).exists():
+        Follow.objects.filter(follower=request.user, following=user_to_follow).delete()
+    else:
+        Follow.objects.create(follower=request.user, following=user_to_follow)
+    return redirect("profile", username=username)
+
+@login_required
+def following(request):
+    user = request.user
+    following_users = user.following.all().values_list('following', flat=True)
+    posts = Post.objects.filter(user__in=following_users).order_by("-timestamp")
+    paginator = Paginator(posts, 10)
+    page_number = request.GET.get('page')
+    page_obj = paginator.get_page(page_number)
+    return render(request, "network/following.html", {
+        "page_obj": page_obj
+    })
+
+@login_required
+def edit_post(request, post_id):
+    post = get_object_or_404(Post, id=post_id, user=request.user)
+    if request.method == "POST":
+        content = request.POST["content"]
+        post.content = content
+        post.save()
+        return JsonResponse({"message": "Post updated successfully."}, status=200)
+    return JsonResponse({"error": "Invalid request."}, status=400)
+
+@login_required
+def like_post(request, post_id):
+    post = get_object_or_404(Post, id=post_id)
+    if Like.objects.filter(user=request.user, post=post).exists():
+        Like.objects.filter(user=request.user, post=post).delete()
+        liked = False
+    else:
+        Like.objects.create(user=request.user, post=post)
+        liked = True
+    return JsonResponse({"liked": liked, "likes_count": post.likes.count()}, status=200)
 
 def login_view(request):
     if request.method == "POST":
