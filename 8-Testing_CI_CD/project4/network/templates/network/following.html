@@ -1,0 +1,16 @@
+{% extends "network/layout.html" %}
+
+{% block body %}
+    <h2>Following</h2>
+    {% for post in posts %}
+        <div class="post">
+            <p>{{ post.user.username }}: {{ post.content }}</p>
+            <p>{{ post.timestamp }}</p>
+            <p id="like-count-{{ post.id }}">{{ post.likes.count }}</p>
+            <button class="like-button" data-post-id="{{ post.id }}">Like</button>
+            {% if post.user == request.user %}
+                <button class="edit-button" data-post-id="{{ post.id }}">Edit</button>
+            {% endif %}
+        </div>
+    {% endfor %}
+{% endblock %}

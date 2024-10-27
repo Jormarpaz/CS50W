@@ -17,7 +17,7 @@
         <div class="post">
             <p>{{ post.content }}</p>
             <p>{{ post.timestamp }}</p>
-            <p>Likes: {{ post.likes.count }}</p>
+            <p id="like-count-{{ post.id }}">{{ post.likes.count }}</p>
             <button class="like-button" data-post-id="{{ post.id }}">
                 {% if user in post.likes.all %}
                     Unlike
@@ -25,7 +25,7 @@
                     Like
                 {% endif %}
             </button>
-            {% if post.user == user %}
+            {% if post.user == request.user %}
                 <button class="edit-button" data-post-id="{{ post.id }}">Edit</button>
             {% endif %}
         </div>

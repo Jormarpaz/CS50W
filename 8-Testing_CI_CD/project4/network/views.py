@@ -11,7 +11,9 @@ from .models import User, Post, Like, Follow
 
 def index(request):
     posts = Post.objects.all().order_by("-timestamp")
-    return render(request, "network/index.html")
+    return render(request, "network/index.html", {
+        "posts": posts
+    })
 
 @login_required
 def new_post(request):
@@ -50,12 +52,7 @@ def following(request):
     user = request.user
     following_users = user.following.all().values_list('following', flat=True)
     posts = Post.objects.filter(user__in=following_users).order_by("-timestamp")
-    paginator = Paginator(posts, 10)
-    page_number = request.GET.get('page')
-    page_obj = paginator.get_page(page_number)
-    return render(request, "network/following.html", {
-        "page_obj": page_obj
-    })
+    return render(request, "network/following.html", {"posts": posts})
 
 @login_required
 def edit_post(request, post_id):
