@@ -14,20 +14,19 @@
     {% endif %}
     <h3>Posts</h3>
     {% for post in posts %}
-        <div class="post">
-            <p>{{ post.content }}</p>
-            <p>{{ post.timestamp }}</p>
-            <p id="like-count-{{ post.id }}">{{ post.likes.count }}</p>
-            <button class="like-button" data-post-id="{{ post.id }}">
-                {% if user in post.likes.all %}
-                    Unlike
-                {% else %}
-                    Like
-                {% endif %}
-            </button>
-            {% if post.user == request.user %}
-                <button class="edit-button" data-post-id="{{ post.id }}">Edit</button>
-            {% endif %}
-        </div>
+    <div class="post">
+        <h4>{{ post.user.username }}</h4>
+        {% if post.user == user %}
+        <button class="edit-button" data-post-id="{{ post.id }}">Edit</button>
+        {% endif %}
+        <p>{{ post.content }}</p>
+        <p class="timestamp">{{ post.timestamp }}</p>
+        <p class="like-count">❤️ {{ post.likes.count }}</p>
+        {% if user != post.user %}
+        <button class="like-button" data-post-id="{{ post.id }}">
+            {% if user in post.likes.all %} Unlike {% else %} Like {% endif %}
+        </button>
+        {% endif %}
+    </div>
     {% endfor %}
 {% endblock %}

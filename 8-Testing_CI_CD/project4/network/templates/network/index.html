@@ -1,22 +1,52 @@
 {% extends "network/layout.html" %} {% block body %}
 <h2>All Posts</h2>
-{% for post in posts %}
-<div class="post">
-  <h4>{{ post.user.username }}</h4>
-  {% if post.user == user %}
-  <button class="edit-button" data-post-id="{{ post.id }}">Edit</button>
-  {% endif %}
-  <p>{{ post.content }}</p>
-  <p>{{ post.timestamp }}</p>
-  <p>❤️ {{ post.likes.count }}</p>
-  {% if user != post.user %}
-  <button class="like-button" data-post-id="{{ post.id }}">
-    {% if user in post.likes.all %} Unlike {% else %} Like {% endif %}
-  </button>
-  {% endif %}
-  
+
+{% if user.is_authenticated %}
+<div class="new-post">
+    <h4>New Post</h2>
+    <form action="{% url 'new_post' %}" method="post">
+        {% csrf_token %}
+        <textarea name="content" rows="4" cols="50" placeholder="What's on your mind?"></textarea>
+        <br>
+        <button type="submit">Post</button>
+    </form>
 </div>
+{% endif %}
+{% for post in posts %}
+    <div class="post">
+        <h4>{{ post.user.username }}</h4>
+        {% if post.user == user %}
+        <button class="edit-button" data-post-id="{{ post.id }}">Edit</button>
+        {% endif %}
+        <p class="content">{{ post.content }}</p>
+        <p class="timestamp">{{ post.timestamp }}</p>
+        <p class="like-count">❤️ {{ post.likes.count }}</p>
+        {% if user != post.user and user.is_authenticated %}
+        <button class="like-button" data-post-id="{{ post.id }}">
+            {% if user in post.likes.all %} Unlike {% else %} Like {% endif %}
+        </button>
+        {% endif %}
+        <div class="comments">
+            <br>
+            <h6>Comments</h6>
+            {% for comment in post.comments.all %}
+                <div class="comment">
+                    <p><strong>{{ comment.user.username }}</strong>: {{ comment.content }}</p>
+                    <p class="timestamp">{{ comment.timestamp }}</p>
+                </div>
+            {% endfor %}
+            {% if user.is_authenticated %}
+            <form action="{% url 'add_comment' post.id %}" method="post">
+                {% csrf_token %}
+                <textarea name="content" rows="2" cols="50" placeholder="Add a comment..."></textarea>
+                <br>
+                <button type="submit">Comment</button>
+            </form>
+            {% endif %}
+        </div>
+    </div>
 {% endfor %}
+
 <div class="pagination">
   {% if page_obj.has_previous %}
   <a href="?page={{ page_obj.previous_page_number }}">Previous</a>

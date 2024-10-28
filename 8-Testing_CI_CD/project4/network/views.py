@@ -6,7 +6,7 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.urls import reverse
 from django.core.paginator import Paginator
 
-from .models import User, Post, Like, Follow
+from .models import User, Post, Like, Follow, Comment
 
 
 def index(request):
@@ -74,6 +74,16 @@ def like_post(request, post_id):
         Like.objects.create(user=request.user, post=post)
         liked = True
     return JsonResponse({"liked": liked, "likes_count": post.likes.count()}, status=200)
+
+@login_required
+def add_comment(request, post_id):
+    if request.method == "POST":
+        post = get_object_or_404(Post, id=post_id)
+        content = request.POST["content"]
+        comment = Comment(user=request.user, post=post, content=content)
+        comment.save()
+        return JsonResponse({"message": "Comment added successfully."}, status=201)
+    return JsonResponse({"error": "POST request required."}, status=400)
 
 def login_view(request):
     if request.method == "POST":

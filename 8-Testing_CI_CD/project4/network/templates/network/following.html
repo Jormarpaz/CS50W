@@ -1,16 +1,41 @@
-{% extends "network/layout.html" %}
+{% extends "network/layout.html" %} {% block body %}
+<h2>Following</h2>
+<div id="posts-container">
+  {% for post in posts %}
+  <div class="post">
+    <h4>{{ post.user.username }}</h4>
+    {% if post.user == user %}
+    <button class="edit-button" data-post-id="{{ post.id }}">Edit</button>
+    {% endif %}
+    <p class="content">{{ post.content }}</p>
+    <p class="timestamp">{{ post.timestamp }}</p>
+    <p class="like-count">❤️ {{ post.likes.count }}</p>
+    {% if user != post.user %}
+    <button class="like-button" data-post-id="{{ post.id }}">
+      {% if user in post.likes.all %} Unlike {% else %} Like {% endif %}
+    </button>
+    {% endif %}
+  </div>
+  {% endfor %}
+</div>
+<div id="no-following-message" style="display: none">
+  <p>You don't follow anyone</p>
+</div>
+<script>
+  document.addEventListener("DOMContentLoaded", function () {
+    const postsContainer = document.getElementById("posts-container");
+    const noFollowingMessage = document.getElementById("no-following-message");
 
-{% block body %}
-    <h2>Following</h2>
-    {% for post in posts %}
-        <div class="post">
-            <p>{{ post.user.username }}: {{ post.content }}</p>
-            <p>{{ post.timestamp }}</p>
-            <p id="like-count-{{ post.id }}">{{ post.likes.count }}</p>
-            <button class="like-button" data-post-id="{{ post.id }}">Like</button>
-            {% if post.user == request.user %}
-                <button class="edit-button" data-post-id="{{ post.id }}">Edit</button>
-            {% endif %}
-        </div>
-    {% endfor %}
+    if (postsContainer.children.length === 0) {
+      noFollowingMessage.style.display = "block";
+      noFollowingMessage.style.textAlign = "center";
+      noFollowingMessage.style.marginTop = "20px";
+      noFollowingMessage.style.fontSize = "20px";
+      noFollowingMessage.style.fontWeight = "bold";
+      noFollowingMessage.style.color = "gray";
+    } else {
+      noFollowingMessage.style.display = "none";
+    }
+  });
+</script>
 {% endblock %}
