@@ -1,8 +1,8 @@
 {% extends "network/layout.html" %}
 {% block body %}
     <h2>{{ profile_user.username }}</h2>
-    <p>Followers: {{ followers }}</p>
-    <p>Following: {{ following }}</p>
+    <p>Followers: <span id="followers-count">{{ followers }}</span></p>
+    <p>Following: <span id="following-count">{{ following }}</span></p>
     {% if user != profile_user %}
         <button id="follow-button" data-username="{{ profile_user.username }}">
             {% if is_following %}
@@ -15,18 +15,23 @@
     <h3>Posts</h3>
     {% for post in posts %}
     <div class="post">
-        <h4>{{ post.user.username }}</h4>
+        <h4>
+            <a href="{% url 'profile' post.user.username %}">
+                {{ post.user.username|capfirst }}
+            </a>
+        </h4>
         {% if post.user == user %}
         <button class="edit-button" data-post-id="{{ post.id }}">Edit</button>
         {% endif %}
-        <p>{{ post.content }}</p>
+        <p class="content">{{ post.content }}</p>
         <p class="timestamp">{{ post.timestamp }}</p>
-        <p class="like-count">❤️ {{ post.likes.count }}</p>
-        {% if user != post.user %}
+        <p class="like-count">❤️ <span id="like-count-{{ post.id }}">{{ post.likes.count }}</span></p>
+        {% if user != post.user and user.is_authenticated %}
         <button class="like-button" data-post-id="{{ post.id }}">
             {% if user in post.likes.all %} Unlike {% else %} Like {% endif %}
         </button>
         {% endif %}
     </div>
     {% endfor %}
+    <input type="hidden" name="csrfmiddlewaretoken" value="{{ csrf_token }}">
 {% endblock %}

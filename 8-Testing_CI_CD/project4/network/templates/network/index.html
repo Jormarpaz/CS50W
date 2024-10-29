@@ -14,13 +14,17 @@
 {% endif %}
 {% for post in posts %}
     <div class="post">
-        <h4>{{ post.user.username }}</h4>
+        <h4>
+            <a href="{% url 'profile' post.user.username %}">
+                {{ post.user.username|capfirst }}
+            </a>
+        </h4>
         {% if post.user == user %}
         <button class="edit-button" data-post-id="{{ post.id }}">Edit</button>
         {% endif %}
         <p class="content">{{ post.content }}</p>
         <p class="timestamp">{{ post.timestamp }}</p>
-        <p class="like-count">❤️ {{ post.likes.count }}</p>
+        <p class="like-count">❤️ <span id="like-count-{{ post.id }}">{{ post.likes.count }}</span></p>
         {% if user != post.user and user.is_authenticated %}
         <button class="like-button" data-post-id="{{ post.id }}">
             {% if user in post.likes.all %} Unlike {% else %} Like {% endif %}
@@ -29,18 +33,22 @@
         <div class="comments">
             <br>
             <h6>Comments</h6>
+            {% if post.comments.all %}
             {% for comment in post.comments.all %}
-                <div class="comment">
-                    <p><strong>{{ comment.user.username }}</strong>: {{ comment.content }}</p>
-                    <p class="timestamp">{{ comment.timestamp }}</p>
-                </div>
-            {% endfor %}
+            <div class="comment">
+                <p><strong>{{ comment.user.username }}</strong>: {{ comment.content }}</p>
+                <p class="timestamp">{{ comment.timestamp }}</p>
+            </div>
+        {% endfor %}
+            {% else %}
+            <p id="no-comments-message">No comments yet.</p>
+            {% endif %}
             {% if user.is_authenticated %}
             <form action="{% url 'add_comment' post.id %}" method="post">
                 {% csrf_token %}
                 <textarea name="content" rows="2" cols="50" placeholder="Add a comment..."></textarea>
                 <br>
-                <button type="submit">Comment</button>
+                <button type="submit">Add</button>
             </form>
             {% endif %}
         </div>
@@ -54,4 +62,5 @@
   <a href="?page={{ page_obj.next_page_number }}">Next</a>
   {% endif %}
 </div>
+<input type="hidden" name="csrfmiddlewaretoken" value="{{ csrf_token }}">
 {% endblock %}

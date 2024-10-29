@@ -1,49 +1,39 @@
-document.addEventListener('DOMContentLoaded', () => {
-    document.querySelectorAll('.like-button').forEach(button => {
-        button.onclick = () => {
-            const postId = button.dataset.postId;
+document.addEventListener("DOMContentLoaded", function () {
+    document.querySelectorAll(".like-button").forEach(button => {
+        button.onclick = function () {
+            const postId = this.dataset.postId;
+            const csrftoken = document.querySelector('[name=csrfmiddlewaretoken]').value;
+
             fetch(`/like/${postId}`, {
-                method: 'PUT'
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': csrftoken
+                },
+                body: JSON.stringify({})
             })
-            .then(response => response.json())
-            .then(result => {
-                if (result.liked) {
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Network response was not ok');
+                }
+                return response.json();
+            })
+            .then(data => {
+                console.log(data);
+                // Actualizar el conteo de likes en la interfaz de usuario
+                const likeCountElement = button.parentElement.querySelector('.like-count');
+                likeCountElement.innerHTML = `❤️ ${data.likes_count}`;
+
+                // Actualizar el texto del botón
+                if (data.liked) {
                     button.innerHTML = 'Unlike';
                 } else {
                     button.innerHTML = 'Like';
                 }
-                button.nextElementSibling.innerHTML = `Likes: ${result.likes_count}`;
+            })
+            .catch(error => {
+                console.error('There was a problem with the fetch operation:', error);
             });
-        };
-    });
-
-    document.querySelectorAll('.edit-button').forEach(button => {
-        button.onclick = () => {
-            const postId = button.dataset.postId;
-            const postContent = button.previousElementSibling.previousElementSibling;
-            const textarea = document.createElement('textarea');
-            textarea.value = postContent.innerHTML;
-            postContent.replaceWith(textarea);
-            button.innerHTML = 'Save';
-            button.onclick = () => {
-                fetch(`/edit/${postId}`, {
-                    method: 'POST',
-                    body: JSON.stringify({
-                        content: textarea.value
-                    }),
-                    headers: {
-                        'Content-Type': 'application/json'
-                    }
-                })
-                .then(response => response.json())
-                .then(result => {
-                    if (result.message) {
-                        textarea.replaceWith(postContent);
-                        postContent.innerHTML = textarea.value;
-                        button.innerHTML = 'Edit';
-                    }
-                });
-            };
         };
     });
 
@@ -51,16 +41,47 @@ document.addEventListener('DOMContentLoaded', () => {
     if (followButton) {
         followButton.onclick = () => {
             const username = followButton.dataset.username;
+            const csrftoken = document.querySelector('[name=csrfmiddlewaretoken]').value;
+
             fetch(`/follow/${username}`, {
-                method: 'PUT'
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': csrftoken
+                },
+                body: JSON.stringify({})
             })
-            .then(() => {
-                if (followButton.innerHTML === 'Follow') {
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Network response was not ok');
+                }
+                return response.json();
+            })
+            .then(data => {
+                console.log(data);
+                // Actualizar el conteo de seguidores en la interfaz de usuario
+                document.getElementById('followers-count').innerHTML = data.followers;
+
+                // Actualizar el texto del botón
+                if (data.is_following) {
                     followButton.innerHTML = 'Unfollow';
                 } else {
                     followButton.innerHTML = 'Follow';
                 }
+            })
+            .catch(error => {
+                console.error('There was a problem with the fetch operation:', error);
             });
         };
     }
 });
+
+document.querySelectorAll('.edit-button').forEach(button => {
+    button.onclick = () => {
+        const postId = button.dataset.postId;
+        const postContent = button.previousElementSibling.previousElementSibling;
+        const textarea = document.createElement('textarea');
+        textarea.value = postContent.innerHTML;
+    };
+});
+

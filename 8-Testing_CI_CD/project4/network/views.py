@@ -1,3 +1,4 @@
+from django.contrib import messages
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
 from django.db import IntegrityError
@@ -38,6 +39,23 @@ def profile(request, username):
         "is_following": is_following
     })
 
+def profile_view(request, username):
+    profile_user = get_object_or_404(User, username=username)
+    # Obtener otros datos necesarios para el perfil
+    posts = profile_user.posts.all().order_by("-timestamp")
+    followers = profile_user.followers.count()
+    following = profile_user.following.count()
+    is_following = Follow.objects.filter(follower=request.user, following=profile_user).exists()
+    
+    context = {
+        'profile_user': profile_user,
+        'posts': posts,
+        'followers': followers,
+        'following': following,
+        'is_following': is_following
+    }
+    return render(request, 'network/profile.html', context)
+
 @login_required
 def follow(request, username):
     user_to_follow = get_object_or_404(User, username=username)
@@ -46,6 +64,24 @@ def follow(request, username):
     else:
         Follow.objects.create(follower=request.user, following=user_to_follow)
     return redirect("profile", username=username)
+
+@login_required
+def follow_view(request, username):
+    if request.method == "PUT":
+        profile_user = get_object_or_404(User, username=username)
+        if request.user == profile_user:
+            return JsonResponse({"error": "You cannot follow yourself."}, status=400)
+
+        if Follow.objects.filter(user=request.user, following=profile_user).exists():
+            Follow.objects.filter(user=request.user, following=profile_user).delete()
+            is_following = False
+        else:
+            Follow.objects.create(user=request.user, following=profile_user)
+            is_following = True
+
+        followers_count = profile_user.followers.count()
+        return JsonResponse({"is_following": is_following, "followers": followers_count}, status=200)
+    return JsonResponse({"error": "PUT request required."}, status=400)
 
 @login_required
 def following(request):
@@ -66,24 +102,31 @@ def edit_post(request, post_id):
 
 @login_required
 def like_post(request, post_id):
-    post = get_object_or_404(Post, id=post_id)
-    if Like.objects.filter(user=request.user, post=post).exists():
-        Like.objects.filter(user=request.user, post=post).delete()
-        liked = False
-    else:
-        Like.objects.create(user=request.user, post=post)
-        liked = True
-    return JsonResponse({"liked": liked, "likes_count": post.likes.count()}, status=200)
+    if request.method == "POST":
+        post = get_object_or_404(Post, id=post_id)
+        if Like.objects.filter(user=request.user, post=post).exists():
+            Like.objects.filter(user=request.user, post=post).delete()
+            liked = False
+        else:
+            Like.objects.create(user=request.user, post=post)
+            liked = True
+        return JsonResponse({"liked": liked, "likes_count": post.likes.count()}, status=200)
+    return JsonResponse({"error": "POST request required."}, status=400)
 
 @login_required
 def add_comment(request, post_id):
     if request.method == "POST":
         post = get_object_or_404(Post, id=post_id)
         content = request.POST["content"]
+        if content.strip() == "":
+            messages.error(request, "Comment cannot be empty.")
+            return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
         comment = Comment(user=request.user, post=post, content=content)
         comment.save()
-        return JsonResponse({"message": "Comment added successfully."}, status=201)
-    return JsonResponse({"error": "POST request required."}, status=400)
+        messages.success(request, "Comment added successfully.")
+        return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
+    messages.error(request, "POST request required.")
+    return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
 
 def login_view(request):
     if request.method == "POST":
