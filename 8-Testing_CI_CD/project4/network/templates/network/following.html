@@ -3,16 +3,15 @@
 <div id="posts-container">
   {% for post in posts %}
   <div class="post">
-    <h4>{{ post.user.username }}</h4>
-    {% if post.user == user %}
-    <button class="edit-button" data-post-id="{{ post.id }}">Edit</button>
-    {% endif %}
+    <h4>{{ post.user.username|capfirst }}</h4>
     <p class="content">{{ post.content }}</p>
     <p class="timestamp">{{ post.timestamp }}</p>
-    <p class="like-count">❤️ {{ post.likes.count }}</p>
-    {% if user != post.user %}
+    <p class="like-count">
+      ❤️ <span id="like-count-{{ post.id }}">{{ post.likes.count }}</span>
+    </p>
+    {% if user.is_authenticated %}
     <button class="like-button" data-post-id="{{ post.id }}">
-      {% if user in post.likes.all %} Unlike {% else %} Like {% endif %}
+      {% if post.id in liked_posts %} Unlike {% else %} Like {% endif %}
     </button>
     {% endif %}
   </div>

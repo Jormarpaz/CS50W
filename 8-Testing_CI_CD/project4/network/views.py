@@ -12,8 +12,15 @@ from .models import User, Post, Like, Follow, Comment
 
 def index(request):
     posts = Post.objects.all().order_by("-timestamp")
+    paginator = Paginator(posts, 10)
+    page_number = request.GET.get('page')
+    page_obj = paginator.get_page(page_number)
+    liked_posts = []
+    if request.user.is_authenticated:
+        liked_posts = Like.objects.filter(user=request.user).values_list('post_id', flat=True)
     return render(request, "network/index.html", {
-        "posts": posts
+        "page_obj": page_obj,
+        "liked_posts": liked_posts
     })
 
 @login_required
@@ -25,20 +32,27 @@ def new_post(request):
         return redirect("index")
     return render(request, "network/new_post.html")
 
+@login_required
 def profile(request, username):
     user = get_object_or_404(User, username=username)
     posts = user.posts.all().order_by("-timestamp")
+    paginator = Paginator(posts, 10)  # Limitar a 10 publicaciones por página
+    page_number = request.GET.get('page')
+    page_obj = paginator.get_page(page_number)
     followers = user.followers.count()
     following = user.following.count()
     is_following = Follow.objects.filter(follower=request.user, following=user).exists()
+    liked_posts = Like.objects.filter(user=request.user).values_list('post_id', flat=True)
     return render(request, "network/profile.html", {
         "profile_user": user,
-        "posts": posts,
+        "page_obj": page_obj,
         "followers": followers,
         "following": following,
-        "is_following": is_following
+        "is_following": is_following,
+        "liked_posts": liked_posts
     })
 
+@login_required
 def profile_view(request, username):
     profile_user = get_object_or_404(User, username=username)
     # Obtener otros datos necesarios para el perfil
@@ -61,9 +75,11 @@ def follow(request, username):
     user_to_follow = get_object_or_404(User, username=username)
     if Follow.objects.filter(follower=request.user, following=user_to_follow).exists():
         Follow.objects.filter(follower=request.user, following=user_to_follow).delete()
+        is_following = False
     else:
         Follow.objects.create(follower=request.user, following=user_to_follow)
-    return redirect("profile", username=username)
+        is_following = True
+    return JsonResponse({"is_following": is_following, "followers": user_to_follow.followers.count()}, status=200)
 
 @login_required
 def follow_view(request, username):
@@ -86,9 +102,17 @@ def follow_view(request, username):
 @login_required
 def following(request):
     user = request.user
+    
     following_users = user.following.all().values_list('following', flat=True)
+    
     posts = Post.objects.filter(user__in=following_users).order_by("-timestamp")
-    return render(request, "network/following.html", {"posts": posts})
+   
+    liked_posts = Like.objects.filter(user=request.user).values_list('post_id', flat=True)
+    
+    return render(request, "network/following.html", {
+        "posts": posts,
+        "liked_posts": liked_posts
+    })
 
 @login_required
 def edit_post(request, post_id):
