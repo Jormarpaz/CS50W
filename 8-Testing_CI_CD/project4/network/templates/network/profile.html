@@ -9,26 +9,48 @@
 {% endif %}
 <h3>Posts</h3>
 {% for post in page_obj %}
-<div class="post">
-  <h4>
-    <a href="{% url 'profile' post.user.username %}">
-      {{ post.user.username|capfirst }}
-    </a>
-  </h4>
-  {% if post.user == user %}
-  <button class="edit-button" data-post-id="{{ post.id }}">Edit</button>
-  {% endif %}
-  <p class="content">{{ post.content }}</p>
-  <p class="timestamp">{{ post.timestamp }}</p>
-  <p class="like-count">
-    ❤️ <span id="like-count-{{ post.id }}">{{ post.likes.count }}</span>
-  </p>
-  {% if user.is_authenticated %}
-  <button class="like-button" data-post-id="{{ post.id }}">
-    {% if post.id in liked_posts %} Unlike {% else %} Like {% endif %}
-  </button>
-  {% endif %}
-</div>
+    <div class="post">
+        <h4>
+            <a href="{% url 'profile' post.user.username %}">
+                {{ post.user.username|capfirst }}
+            </a>
+        </h4>
+        {% if post.user == user %}
+        <button class="edit-button" data-post-id="{{ post.id }}">Edit</button>
+        {% endif %}
+        <p class="content">{{ post.content }}</p>
+        <p class="timestamp">{{ post.timestamp }}</p>
+        <p class="like-count">
+            ❤️ <span id="like-count-{{ post.id }}">{{ post.likes.count }}</span>
+        </p>
+        {% if user.is_authenticated %}
+        <button class="like-button" data-post-id="{{ post.id }}">
+            {% if post.id in liked_posts %} Unlike {% else %} Like {% endif %}
+        </button>
+        {% endif %}
+        <div class="comments">
+            <br>
+            <h6>Comments</h6>
+            {% if post.comments.all %}
+            {% for comment in post.comments.all %}
+            <div class="comment">
+                <p><strong>{{ comment.user.username }}</strong>: {{ comment.content }}</p>
+                <p class="timestamp">{{ comment.timestamp }}</p>
+            </div>
+            {% endfor %}
+            {% else %}
+            <p id="no-comments-message">No comments yet.</p>
+            {% endif %}
+            {% if user.is_authenticated %}
+            <form action="{% url 'add_comment' post.id %}" method="post">
+                {% csrf_token %}
+                <textarea name="content" rows="2" cols="50" placeholder="Add a comment..."></textarea>
+                <br>
+                <button type="submit">Add</button>
+            </form>
+            {% endif %}
+        </div>
+    </div>
 {% endfor %}
 <div class="pagination">
   {% if page_obj.has_previous %}

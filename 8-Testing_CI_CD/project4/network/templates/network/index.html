@@ -24,7 +24,9 @@
         {% endif %}
         <p class="content">{{ post.content }}</p>
         <p class="timestamp">{{ post.timestamp }}</p>
-        <p class="like-count">❤️ <span id="like-count-{{ post.id }}">{{ post.likes.count }}</span></p>
+        <p class="like-count">
+            ❤️ <span id="like-count-{{ post.id }}">{{ post.likes.count }}</span>
+        </p>
         {% if user.is_authenticated %}
         <button class="like-button" data-post-id="{{ post.id }}">
             {% if post.id in liked_posts %} Unlike {% else %} Like {% endif %}
@@ -39,7 +41,7 @@
                 <p><strong>{{ comment.user.username }}</strong>: {{ comment.content }}</p>
                 <p class="timestamp">{{ comment.timestamp }}</p>
             </div>
-        {% endfor %}
+            {% endfor %}
             {% else %}
             <p id="no-comments-message">No comments yet.</p>
             {% endif %}

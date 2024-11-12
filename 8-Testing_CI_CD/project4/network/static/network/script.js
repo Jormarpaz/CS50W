@@ -75,15 +75,15 @@ document.addEventListener("DOMContentLoaded", function () {
   }
 
   document.querySelectorAll(".edit-button").forEach((button) => {
-    button.onclick = () => {
-      const postId = button.dataset.postId;
-      const postContent = button.previousElementSibling.previousElementSibling;
+    button.onclick = function () {
+      const postId = this.dataset.postId;
+      const postContent = this.parentElement.querySelector(".content");
       const textarea = document.createElement("textarea");
       textarea.value = postContent.innerHTML;
       postContent.replaceWith(textarea);
-      button.innerHTML = "Save";
-      button.onclick = () => {
-        fetch(`/edit_post/${postId}`, {
+      this.innerHTML = "Save";
+      this.onclick = function () {
+        fetch(`/edit_post/${postId}/`, {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
@@ -99,7 +99,8 @@ document.addEventListener("DOMContentLoaded", function () {
             if (result.message) {
               textarea.replaceWith(postContent);
               postContent.innerHTML = textarea.value;
-              button.innerHTML = "Edit";
+              this.innerHTML = "Edit";
+              this.onclick = editPostHandler;
             } else {
               console.error(result.error);
             }
@@ -108,3 +109,36 @@ document.addEventListener("DOMContentLoaded", function () {
     };
   });
 });
+
+function editPostHandler() {
+  const postId = this.dataset.postId;
+  const postContent = this.parentElement.querySelector(".content");
+  const textarea = document.createElement("textarea");
+  textarea.value = postContent.innerHTML;
+  postContent.replaceWith(textarea);
+  this.innerHTML = "Save";
+  this.onclick = function () {
+    fetch(`/edit_post/${postId}/`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "X-CSRFToken": document.querySelector("[name=csrfmiddlewaretoken]")
+          .value,
+      },
+      body: JSON.stringify({
+        content: textarea.value,
+      }),
+    })
+      .then((response) => response.json())
+      .then((result) => {
+        if (result.message) {
+          textarea.replaceWith(postContent);
+          postContent.innerHTML = textarea.value;
+          this.innerHTML = "Edit";
+          this.onclick = editPostHandler;
+        } else {
+          console.error(result.error);
+        }
+      });
+  };
+}

@@ -2,6 +2,7 @@ from django.contrib import messages
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
 from django.db import IntegrityError
+import json
 from django.http import HttpResponse, HttpResponseRedirect, JsonResponse
 from django.shortcuts import render, redirect, get_object_or_404
 from django.urls import reverse
@@ -118,10 +119,13 @@ def following(request):
 def edit_post(request, post_id):
     post = get_object_or_404(Post, id=post_id, user=request.user)
     if request.method == "POST":
-        content = request.POST["content"]
-        post.content = content
-        post.save()
-        return JsonResponse({"message": "Post updated successfully."}, status=200)
+        data = json.loads(request.body)
+        content = data.get("content", "")
+        if content:
+            post.content = content
+            post.save()
+            return JsonResponse({"message": "Post updated successfully."}, status=200)
+        return JsonResponse({"error": "Content cannot be empty."}, status=400)
     return JsonResponse({"error": "Invalid request."}, status=400)
 
 @login_required
