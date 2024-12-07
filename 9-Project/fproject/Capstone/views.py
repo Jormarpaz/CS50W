@@ -12,12 +12,18 @@ from .forms import FileUploadForm
 
 # Create your views here.
 
+
 def index(request):
     if request.user.is_authenticated:
-        user_files = File.objects.filter(user = request.user).order_by("-uploaded_at")[:5]
+        user_files = File.objects.filter(
+            user=request.user).order_by("-uploaded_at")[:5]
         return render(request, "Capstone/index.html", {
             "files": user_files,
         })
+    else:
+        # Renderizar una versión para usuarios no autenticados
+        return render(request, "Capstone/index.html")
+
 
 @login_required
 def upload_file(request):
@@ -33,8 +39,57 @@ def upload_file(request):
         return render(request, "Capstone/upload.html", {"form": form})
 
 
+@login_required
+def files(request):
+    user_files = File.objects.filter(
+        user=request.user).order_by("-uploaded_at")
+    return render(request, "Capstone/files.html", {
+        "files": user_files,
+    })
 
 
+@login_required
+def calendar(request):
+    user_events = File.objects.filter(
+        user=request.user).order_by("uploaded_at")
+    return render(request, "Capstone/calendar.html", {
+        "events": user_events,
+    })
+
+@login_required
+def tests(request):
+    if request.method == "POST":
+        test_name = request.POST["test_name"]
+        test_description = request.POST["test_description"]
+        test_date = request.POST["test_date"]
+
+        # Aquí puedes agregar la lógica para guardar los datos del test en la base de datos
+        # o realizar cualquier otra acción necesaria.
+
+        messages.success(request, "Test information has been submitted successfully!")
+        return redirect("tests")
+    return render(request, "Capstone/tests.html")
+
+
+def contact(request):
+    if request.method == "POST":
+        name = request.POST["name"]
+        email = request.POST["email"]
+        message = request.POST["message"]
+
+        # Aquí puedes agregar la lógica para enviar el mensaje por correo electrónico
+        # o guardarlo en la base de datos, según tus necesidades.
+
+        messages.success(request, "Your message has been sent successfully!")
+        return redirect("contact")
+    return render(request, "Capstone/contact.html")
+
+
+############################################
+############################################
+############### AUTENTICACION ##############
+############################################
+############################################
 
 
 def login_view(request):
@@ -51,9 +106,11 @@ def login_view(request):
             })
     return render(request, 'Capstone/login.html')
 
+
 def logout_view(request):
     logout(request)
     return redirect('login')
+
 
 def register(request):
     if request.method == "POST":

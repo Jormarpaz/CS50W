@@ -1,0 +1,14 @@
+{% extends "Capstone/layout.html" %}
+
+{% block title %}
+    Mis Archivos
+{% endblock %}
+
+{% block body %}
+    <h1>Mis Archivos</h1>
+    <ul>
+        {% for file in user_files %}
+            <li><a>{{ file.filename }}</a></li>
+        {% endfor %}
+    </ul>
+{% endblock %}

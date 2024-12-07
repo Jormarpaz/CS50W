@@ -1,17 +1,14 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Inicio</title>
-</head>
-<body>
+{% extends "Capstone/layout.html" %}
+{% block title %}
+    Inicio
+{% endblock %}
+{% block body %}
     {% if user.is_authenticated %}
-        <h1>Bienvenido, {{ user.username }}!</h1>
+        <h1>Bienvenid@, {{ user.username }}!</h1>
         <h2>Tus archivos recientes: </h2>
         <ul>
             {% for file in files %}
-                <li>{{ file.name }} -Subido el {{ file.uploaded_at}}</li>
+                <li>{{ file.name }} - Subido el {{ file.uploaded_at }}</li>
             {% empty %}
                 <li>No tienes archivos subidos aún.</li>
             {% endfor %}
@@ -20,7 +17,6 @@
         <a href="{% url 'logout' %}">Cerrar sesión</a>
     {% else %}
         <h1>Bienvenid@!</h1>
-        <p><a href="{% url 'login' %}">Iniciar sesión</a> o <a href="{% url 'register'%}">Regístrate</a> para comenzar.</p>
+        <p><a href="{% url 'login' %}">Iniciar sesión</a> o <a href="{% url 'register' %}">Regístrate</a> para comenzar.</p>
     {% endif %}
-</body>
-</html>
+{% endblock %}
