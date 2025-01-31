@@ -168,62 +168,65 @@
     };
   });
 </script>
-{% endblock %} {% block body %}
-<div>
-  <div id="calendar"></div>
-</div>
-
-<!-- Formulario de añadir evento oculto -->
-<form
-  id="event-form"
-  style="
-    display: none;
-    position: fixed;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    background-color: white;
-    padding: 20px;
-    border: 1px solid #ccc;
-    border-radius: 5px;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-    z-index: 1000;
-  "
->
-  <div class="form-group">
-    <label for="event-title">Título del evento:</label>
-    <input
-      type="text"
-      id="event-title"
-      class="form-control input-no-outline"
-      placeholder="Introduce el título del evento"
-      autocomplete="off"
-    />
+{% endblock %} 
+{% block body %}
+<div class="container mt-4">
+  <div>
+    <div id="calendar"></div>
   </div>
-  <div class="form-group">
-    <label for="event-start">Hora de inicio:</label>
-    <input type="time" id="event-start" class="form-control input-no-outline" />
-  </div>
-  <div class="form-group">
-    <label for="event-end">Hora de finalización:</label>
-    <input type="time" id="event-end" class="form-control input-no-outline" />
-  </div>
-  <div class="form-group">
-    <label for="event-all-day">Todo el día:</label>
-    <input
-      type="checkbox"
-      id="event-all-day"
-      class="form-control input-no-outline"
-      onchange="localStorage.setItem('eventAllDay', this.checked)"
-    />
-  </div>
-  <button type="submit" class="btn btn-primary">Añadir evento</button>
-  <button
-    type="button"
-    class="btn btn-secondary"
-    onclick="document.getElementById('event-form').style.display='none'"
+  
+  <!-- Formulario de añadir evento oculto -->
+  <form
+    id="event-form"
+    style="
+      display: none;
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      background-color: white;
+      padding: 20px;
+      border: 1px solid #ccc;
+      border-radius: 5px;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+      z-index: 1000;
+    "
   >
-    Cancelar
-  </button>
-</form>
+    <div class="form-group">
+      <label for="event-title">Título del evento:</label>
+      <input
+        type="text"
+        id="event-title"
+        class="form-control input-no-outline"
+        placeholder="Introduce el título del evento"
+        autocomplete="off"
+      />
+    </div>
+    <div class="form-group">
+      <label for="event-start">Hora de inicio:</label>
+      <input type="time" id="event-start" class="form-control input-no-outline" />
+    </div>
+    <div class="form-group">
+      <label for="event-end">Hora de finalización:</label>
+      <input type="time" id="event-end" class="form-control input-no-outline" />
+    </div>
+    <div class="form-group">
+      <label for="event-all-day">Todo el día:</label>
+      <input
+        type="checkbox"
+        id="event-all-day"
+        class="form-control input-no-outline"
+        onchange="localStorage.setItem('eventAllDay', this.checked)"
+      />
+    </div>
+    <button type="submit" class="btn btn-primary">Añadir evento</button>
+    <button
+      type="button"
+      class="btn btn-secondary"
+      onclick="document.getElementById('event-form').style.display='none'"
+    >
+      Cancelar
+    </button>
+  </form>
+</div>
 {% endblock %}

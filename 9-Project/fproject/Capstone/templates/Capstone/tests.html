@@ -1,23 +1,29 @@
 {% extends "Capstone/layout.html" %}
 
 {% block body %}
+<div class="container mt-4">
     <h2>Generar Test</h2>
-    <form action="/generate_test" method="post">
-        <div>
-            <label for="file">Elige un archivo:</label>
-            <select id="file" name="file">
-                <!-- Aquí se deben listar los archivos subidos por el usuario -->
-                <option value="archivo1">Archivo 1</option>
-                <option value="archivo2">Archivo 2</option>
-                <!-- Agregar más opciones según los archivos disponibles -->
-            </select>
-        </div>
-        <div>
-            <label for="num_questions">Número de preguntas (máximo 20):</label>
-            <input type="number" id="num_questions" name="num_questions" min="1" max="20" required>
-        </div>
-        <div>
-            <button type="submit">Generar Test</button>
-        </div>
-    </form>
+    {% if form %}
+        <form action="/generate_test" method="post">
+            <div>
+                <label for="file">Elige un archivo:</label>
+                <select id="file" name="file">
+                    <!-- Aquí se deben listar los archivos subidos por el usuario -->
+                    <option value="archivo1">Archivo 1</option>
+                    <option value="archivo2">Archivo 2</option>
+                    <!-- Agregar más opciones según los archivos disponibles -->
+                </select>
+            </div>
+            <div>
+                <label for="num_questions">Número de preguntas (máximo 20):</label>
+                <input type="number" id="num_questions" name="num_questions" min="1" max="20" required>
+            </div>
+            <div>
+                <button type="submit">Generar Test</button>
+            </div>
+        </form>
+    {% else %}
+        <li>No tienes test creados todavía.</li>
+    {% endif %}
+</div>
 {% endblock %}

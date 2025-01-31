@@ -8,53 +8,64 @@ from django.urls import reverse
 
 
 from .models import User, File
-from .forms import FileUploadForm
+from . import forms
 
 # Create your views here.
-
-
 def index(request):
-    if request.user.is_authenticated:
-        user_files = File.objects.filter(
-            user=request.user).order_by("-uploaded_at")[:5]
-        return render(request, "Capstone/index.html", {
-            "files": user_files,
-        })
-    else:
-        # Renderizar una versión para usuarios no autenticados
-        return render(request, "Capstone/index.html")
+    return render(request, "Capstone/index.html")
+    
 
+# *************************************************************
+# *************************************************************
+# *********************** Archivos ****************************
+# *************************************************************
+# *************************************************************
 
 @login_required
 def upload_file(request):
-    if request.method == "POST":
-        form = FileUploadForm(request.POST, request.FILES)
+    if request.method == 'POST':
+        form = forms.UploadFile(request.POST, request.FILES)
         if form.is_valid():
             file = form.save(commit=False)
             file.user = request.user
             file.save()
-            return redirect("index")
-        else:
-            form = FileUploadForm()
-        return render(request, "Capstone/upload.html", {"form": form})
+            return redirect("files")
+    else:
+        form = forms.UploadFile()
+    return render(request, "Capstone/upload.html", {
+        "form": form,
+    })
+    
 
 
 @login_required
 def files(request):
     user_files = File.objects.filter(
-        user=request.user).order_by("-uploaded_at")
+        user=request.user).order_by("date")
     return render(request, "Capstone/files.html", {
-        "files": user_files,
+        "user_files": user_files,
     })
+
+# *************************************************************
+# *************************************************************
+# ********************** Calendario ***************************
+# *************************************************************
+# *************************************************************
 
 
 @login_required
 def calendar(request):
     user_events = File.objects.filter(
-        user=request.user).order_by("uploaded_at")
+        user=request.user).order_by("date")
     return render(request, "Capstone/calendar.html", {
         "events": user_events,
     })
+
+# *************************************************************
+# *************************************************************
+# ************************ Tests ******************************
+# *************************************************************
+# *************************************************************
 
 @login_required
 def tests(request):
@@ -70,6 +81,11 @@ def tests(request):
         return redirect("tests")
     return render(request, "Capstone/tests.html")
 
+# *************************************************************
+# *************************************************************
+# *********************** Contacto ****************************
+# *************************************************************
+# *************************************************************
 
 def contact(request):
     if request.method == "POST":

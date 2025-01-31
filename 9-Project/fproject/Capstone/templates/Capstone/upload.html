@@ -1,0 +1,18 @@
+{% extends "Capstone/layout.html" %} 
+
+{% block title %} 
+  Subir Archivo 
+{% endblock%} 
+
+{% block body %}
+
+  <form method="post" class="form-with-validation" autocomplete="off" action="{% url 'file-upload' %}" enctype="multipart/form-data"> 
+    <h2>
+      Subir un nuevo archivo
+    </h2>
+    {% csrf_token %}
+    {{ form.as_p }}
+    <button type="submit">Subir</button>
+  </form>
+
+{% endblock %}

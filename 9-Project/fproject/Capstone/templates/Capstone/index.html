@@ -3,20 +3,23 @@
     Inicio
 {% endblock %}
 {% block body %}
+<div class="container mt-4">
     {% if user.is_authenticated %}
-        <h1>Bienvenid@, {{ user.username }}!</h1>
-        <h2>Tus archivos recientes: </h2>
-        <ul>
-            {% for file in files %}
-                <li>{{ file.name }} - Subido el {{ file.uploaded_at }}</li>
-            {% empty %}
-                <li>No tienes archivos subidos aún.</li>
-            {% endfor %}
-        </ul>
-        <a href="{% url 'upload' %}">Subir un archivo</a>
-        <a href="{% url 'logout' %}">Cerrar sesión</a>
-    {% else %}
-        <h1>Bienvenid@!</h1>
-        <p><a href="{% url 'login' %}">Iniciar sesión</a> o <a href="{% url 'register' %}">Regístrate</a> para comenzar.</p>
-    {% endif %}
+    <h1>Bienvenid@, {{ user.username }}!</h1>
+    <h2>Tus archivos recientes: </h2>
+    <ul>
+        {% for file in files %}
+            <li>{{ file.name }} - Subido el {{ file.uploaded_at }}</li>
+        {% empty %}
+            <li>No tienes archivos subidos aún.</li>
+        {% endfor %} 
+    </ul>
+    <a href="{% url 'file-upload' %}">Subir un archivo</a>
+    </br>
+    <a href="{% url 'logout' %}">Cerrar sesión</a>
+{% else %}
+    <h1>Bienvenid@!</h1>
+    <p><a href="{% url 'login' %}">Iniciar sesión</a> o <a href="{% url 'register' %}">Regístrate</a> para comenzar.</p>
+{% endif %}
+</div>
 {% endblock %}

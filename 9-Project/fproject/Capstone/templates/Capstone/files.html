@@ -5,10 +5,16 @@
 {% endblock %}
 
 {% block body %}
+<div class="container mt-4"">
     <h1>Mis Archivos</h1>
     <ul>
-        {% for file in user_files %}
-            <li><a>{{ file.filename }}</a></li>
-        {% endfor %}
+        {% if user_files %}
+            {% for file in user_files %}
+                <li><a>{{ file.name }}</a></li>
+            {% endfor %}
+        {% else %}
+            <li>No tienes archivos subidos aún.</li>
+        {% endif %}
     </ul>
+</div>
 {% endblock %}

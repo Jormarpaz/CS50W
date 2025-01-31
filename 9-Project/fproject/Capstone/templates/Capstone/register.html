@@ -5,7 +5,7 @@ Registro
 {% endblock %}
 
 {% block body %}
-
+<div class="container mt-4">
     <h2>Register</h2>
 
     {% if message %}
@@ -30,5 +30,5 @@ Registro
     </form>
 
     Already have an account? <a href="{% url 'login' %}">Log In here.</a>
-
+</div>
 {% endblock %}
