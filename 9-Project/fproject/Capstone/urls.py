@@ -17,5 +17,6 @@ urlpatterns = [
 
     path('contact/', views.contact, name='contact'),
 
-    path('tests/', views.tests, name='tests'),
+    path('tests/', views.select_file_for_test, name='tests'),
+    path('generate-test/', views.generate_test, name='generate-test'),
 ]

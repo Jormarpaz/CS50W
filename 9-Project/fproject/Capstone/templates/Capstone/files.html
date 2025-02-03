@@ -10,7 +10,7 @@
     <ul>
         {% if user_files %}
             {% for file in user_files %}
-                <li><a>{{ file.name }}</a></li>
+                <li><a href="{{ file.file.url }}">{{ file.name }}</a> - Subido el {{ file.date }}</li>
             {% endfor %}
         {% else %}
             <li>No tienes archivos subidos aún.</li>

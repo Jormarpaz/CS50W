@@ -1,20 +1,24 @@
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
 from django.http import HttpResponse, HttpResponseRedirect
-from django.shortcuts import render, redirect
+from django.shortcuts import render, redirect, get_object_or_404
 from django.db import IntegrityError
 from django.contrib import messages
 from django.urls import reverse
 
 
-from .models import User, File
+from .tests.generator import extract_text_from_file, extract_key_phrases, generate_questions
+from .models import User, File, Test
 from . import forms
 
 # Create your views here.
 def index(request):
-    return render(request, "Capstone/index.html")
+    user_files = File.objects.filter(
+        user=request.user).order_by("-date")
+    return render(request, "Capstone/index.html", {
+        "user_files": user_files,
+    })
     
-
 # *************************************************************
 # *************************************************************
 # *********************** Archivos ****************************
@@ -41,7 +45,7 @@ def upload_file(request):
 @login_required
 def files(request):
     user_files = File.objects.filter(
-        user=request.user).order_by("date")
+        user=request.user).order_by("-date")
     return render(request, "Capstone/files.html", {
         "user_files": user_files,
     })
@@ -66,20 +70,29 @@ def calendar(request):
 # ************************ Tests ******************************
 # *************************************************************
 # *************************************************************
+@login_required
+def select_file_for_test(request):
+    user_files = File.objects.filter(user=request.user)  # Archivos del usuario autenticado
+    return render(request, "Capstone/tests.html", {"user_files": user_files})
 
 @login_required
-def tests(request):
-    if request.method == "POST":
-        test_name = request.POST["test_name"]
-        test_description = request.POST["test_description"]
-        test_date = request.POST["test_date"]
+def generate_test(request):
+    file_id = request.GET.get("file_id")  # Obtener el ID del archivo seleccionado
+    num_questions = int(request.GET.get("num_questions", 5))  # Número de preguntas (por defecto 5)
 
-        # Aquí puedes agregar la lógica para guardar los datos del test en la base de datos
-        # o realizar cualquier otra acción necesaria.
+    if not file_id:
+        return redirect("select-test-file")  # Si no se seleccionó archivo, redirigir a la selección
 
-        messages.success(request, "Test information has been submitted successfully!")
-        return redirect("tests")
-    return render(request, "Capstone/tests.html")
+    file = get_object_or_404(File, id=file_id, user=request.user)  # Asegurar que el archivo pertenece al usuario
+    file_path = file.file.path  # Ruta del archivo
+    text = extract_text_from_file(file_path)  # Extraer el texto del archivo
+
+    questions = generate_questions(text, num_questions)  # Generar preguntas
+
+    # Guardar el test en la base de datos
+    test = Test.objects.create(user=request.user, file=file, questions=questions)
+
+    return render(request, "Capstone/test.html", {"test": test})
 
 # *************************************************************
 # *************************************************************

@@ -1,0 +1,14 @@
+{% extends "Capstone/layout.html" %}
+
+{% block body %}
+<h1>Test Generado</h1>
+<p>Archivo: {{ test.file.name }}</p>
+
+<ol>
+    {% for question in test.questions %}
+        <li>{{ question }}</li>
+    {% endfor %}
+</ol>
+
+<a href="{% url 'files' %}">Volver a Mis Archivos</a>
+{% endblock %}
