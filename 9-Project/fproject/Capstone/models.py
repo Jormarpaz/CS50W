@@ -18,11 +18,19 @@ class User(AbstractUser):
         blank=True
     )
 
+class Folder(models.Model):
+    name = models.CharField(max_length=255)
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+
+    def __str__(self):
+        return self.name
+
 class File(models.Model):
-    user = models.ForeignKey(User, on_delete=models.CASCADE, null=True, blank=True)
     name = models.CharField(max_length=75)
-    description = models.TextField()
     file = models.FileField(upload_to=directorio_usuario)
+    user = models.ForeignKey(User, on_delete=models.CASCADE, null=True, blank=True)
+    folder = models.ForeignKey(Folder, on_delete=models.CASCADE, null=True, blank=True)
+    tags = models.CharField(max_length=255, blank=True)
     date= models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
@@ -36,3 +44,4 @@ class Test(models.Model):
 
     def __str__(self):
         return f"Test de {self.user.username} - {self.file.name}"
+    

@@ -31,11 +31,6 @@ body {
 */
 /*****************************************************/
 
-.form-with-validation {
-    display: block !important;
-    visibility: visible !important;
-    z-index: inherit;
-}
 
 /*****************************************************/
 /*****************************************************/
@@ -52,6 +47,10 @@ h1, h2, h3, h4, h5, h6 {
     color: #2c3e50;
     margin-bottom: 20px;
     font-family: 'Roboto Slab', serif;
+}
+
+h2 {
+    margin-top: 10px;
 }
 
 /* Paragraphs */
@@ -110,19 +109,14 @@ button:hover {
     height: 700px; 
 }
 
-form {
-    width: 500px;
-    position: fixed;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
+form { 
+    position: relative; /* Change to relative */
+    margin: 20px auto; /* Center the form horizontally */
     background-color: white;
     padding: 20px;
     border: 1px solid #ccc;
     border-radius: 5px;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-    z-index: 1000;
-    display: none;
 }
 
 .form-group {

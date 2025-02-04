@@ -8,7 +8,7 @@ from django.urls import reverse
 
 
 from .tests.generator import extract_text_from_file, extract_key_phrases, generate_questions
-from .models import User, File, Test
+from .models import User, File, Test, Folder
 from . import forms
 
 # Create your views here.
@@ -26,29 +26,56 @@ def index(request):
 # *************************************************************
 
 @login_required
-def upload_file(request):
+def upload_file(request, folder_id=None):
+    folder = None
+    if folder_id:
+        folder = get_object_or_404(Folder, id=folder_id, user=request.user)
+
     if request.method == 'POST':
         form = forms.UploadFile(request.POST, request.FILES)
         if form.is_valid():
             file = form.save(commit=False)
             file.user = request.user
+            if folder:
+                file.folder = folder
             file.save()
             return redirect("files")
     else:
         form = forms.UploadFile()
     return render(request, "Capstone/upload.html", {
         "form": form,
+        "folder": folder,
     })
     
-
-
 @login_required
 def files(request):
+    folders = Folder.objects.filter(user=request.user)
     user_files = File.objects.filter(
-        user=request.user).order_by("-date")
+        user=request.user, folder__isnull=True).order_by("-date")
     return render(request, "Capstone/files.html", {
+        "folders": folders,
         "user_files": user_files,
     })
+
+@login_required
+def folder_files(request, folder_id):
+    folder = get_object_or_404(Folder, id=folder_id, user=request.user)
+    files = File.objects.filter(user=request.user, folder=folder)
+    return render(request, "Capstone/folder_files.html", {"folder": folder, "files": files})
+
+@login_required
+def create_folder(request):
+    if request.method == "POST":
+        form = forms.FolderForm(request.POST)
+        if form.is_valid():
+            folder = form.save(commit=False)
+            folder.user = request.user
+            folder.save()
+            return redirect("files")
+    else:
+        form = forms.FolderForm()
+    return render(request, "Capstone/create_folder.html", {"form": form})
+
 
 # *************************************************************
 # *************************************************************
@@ -81,7 +108,7 @@ def generate_test(request):
     num_questions = int(request.GET.get("num_questions", 5))  # Número de preguntas (por defecto 5)
 
     if not file_id:
-        return redirect("select-test-file")  # Si no se seleccionó archivo, redirigir a la selección
+        return redirect("tests")  # Si no se seleccionó archivo, redirigir a la selección
 
     file = get_object_or_404(File, id=file_id, user=request.user)  # Asegurar que el archivo pertenece al usuario
     file_path = file.file.path  # Ruta del archivo
@@ -93,6 +120,31 @@ def generate_test(request):
     test = Test.objects.create(user=request.user, file=file, questions=questions)
 
     return render(request, "Capstone/test.html", {"test": test})
+
+
+@login_required
+def check_answers(request):
+    if request.method == "POST":
+        test_id = request.POST.get("test_id")
+        test = Test.objects.get(id=test_id, user=request.user)
+        correct_answers = 0
+        correct_answer_texts = []
+
+        for question in test.questions:
+            selected_option_id = request.POST.get(f"question_{question['id']}")
+            correct_option = next(option for option in question['options'] if option['is_correct'])
+            correct_answer_texts.append(correct_option['text'])
+            if selected_option_id and int(selected_option_id) == correct_option['id']:
+                correct_answers += 1
+
+        return render(request, "Capstone/results.html", {
+            "test": test,
+            "correct_answers": correct_answers,
+            "total_questions": len(test.questions),
+            "correct_answer_texts": correct_answer_texts,
+        })
+
+    return redirect("index")
 
 # *************************************************************
 # *************************************************************

@@ -5,14 +5,20 @@
 {% endblock%} 
 
 {% block body %}
-
-  <form method="post" class="form-with-validation" autocomplete="off" action="{% url 'file-upload' %}" enctype="multipart/form-data"> 
-    <h2>
-      Subir un nuevo archivo
-    </h2>
+<div class="container mt-4">
+  <h2>
+    Subir un nuevo archivo
+  </h2>
+  <form style="width: 75%;" method="post" autocomplete="off" action="{% url 'file-upload' %}" enctype="multipart/form-data"> 
     {% csrf_token %}
     {{ form.as_p }}
-    <button type="submit">Subir</button>
+    {% if not folder %}
+      <div class="form-group">
+        {{ form.folder.label_tag }} {{ form.folder }}
+      </div>
+    {% endif %}
+    <button type="submit" class="btn btn-primary">Subir</button>
   </form>
-
+  <a class="btn btn-secondary" href="{% url 'files' %}">Volver a Mis Archivos</a>
+</div>
 {% endblock %}

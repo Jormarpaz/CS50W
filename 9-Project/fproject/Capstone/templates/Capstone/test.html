@@ -1,14 +1,31 @@
 {% extends "Capstone/layout.html" %}
 
 {% block body %}
-<h1>Test Generado</h1>
+<div class="container mt-4">
+    <h1>Test Generado</h1>
 <p>Archivo: {{ test.file.name }}</p>
 
-<ol>
-    {% for question in test.questions %}
-        <li>{{ question }}</li>
-    {% endfor %}
-</ol>
+<form method="post" action="{% url 'check_answers' %}">
+    {% csrf_token %}
+    <input type="hidden" name="test_id" value="{{ test.id }}">
+    <ol>
+        {% for question in test.questions %}
+            <li>
+                {{ question.text }}
+                <ul style="list-style: none; padding: 0; gap: 5px;">
+                    {% for option in question.options %}
+                        <li style="display: inline-flex; align-items: center;">
+                            <input type="radio" name="question_{{ question.id }}" value="{{ option.id }}" id="option_{{ question.id }}_{{ option.id }}" style="margin: 0; width: 16px; height: 16px;">
+                            <label for="option_{{ question.id }}_{{ option.id }}" style="margin-left: 5px; margin-right: 10px; margin-top: 7.5px; line-height: 1;">{{ option.text }}</label>
+                        </li>
+                    {% endfor %}
+                </ul>
+            </li>
+        {% endfor %}
+    </ol>
+    <button type="submit" class="btn btn-primary">Enviar Respuestas</button>
+</form>
 
-<a href="{% url 'files' %}">Volver a Mis Archivos</a>
+<a class="btn btn-secondary" href="{% url 'files' %}">Volver a Mis Archivos</a>
+</div>
 {% endblock %}

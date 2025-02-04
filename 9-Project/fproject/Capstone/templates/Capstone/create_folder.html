@@ -1,0 +1,17 @@
+{% extends "Capstone/layout.html" %}
+
+{% block title %}
+    Crear Carpeta
+{% endblock %}
+
+{% block body %}
+<div class="container mt-4">
+    <h1>Crear Carpeta</h1>
+    <form method="post">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <button type="submit" class="btn btn-primary">Crear</button>
+    </form>
+    <a class="btn btn-secondary" href="{% url 'files' %}">Volver a Mis Archivos</a>
+</div>
+{% endblock %}

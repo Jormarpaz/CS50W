@@ -1,0 +1,18 @@
+{% extends "Capstone/layout.html" %}
+
+{% block body %}
+<div class="container mt-4">
+    <h1>Resultados del Test</h1>
+    <p>Archivo: {{ test.file.name }}</p>
+    <p>Respuestas correctas: {{ correct_answers }} de {{ total_questions }}</p>
+
+    <h2>Respuestas Correctas:</h2>
+    <ul>
+        {% for answer in correct_answer_texts %}
+            <li>{{ answer }}</li>
+        {% endfor %}
+    </ul>
+
+    <a href="{% url 'files' %}" class="btn btn-secondary">Volver a Mis Archivos</a>
+</div>
+{% endblock %}

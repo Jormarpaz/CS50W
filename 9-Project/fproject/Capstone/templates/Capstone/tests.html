@@ -5,18 +5,23 @@
     <h2>Generar Test</h2>
     <p>Selecciona un archivo para generar preguntas de estudio:</p>
     {% if user_files %}
-    <form style="display:block;" method="get" action="{% url 'generate-test' %}">
-        <label for="file">Selecciona un archivo:</label>
-        <select name="file_id" id="file">
-            {% for file in user_files %}
-                <option value="{{ file.id }}">{{ file.name }}</option>
-            {% endfor %}
-        </select>
+    <p>Archivos disponibles: {{ user_files|length }}</p>
+    <form style="width: 50%;" method="get" action="{% url 'generate-test' %}">
+        {% csrf_token %}
+        <div class="form-group">
+            <label for="file">Selecciona un archivo:</label>
+            <select name="file_id" id="file" class="form-control">
+                {% for file in user_files %}
+                    <option value="{{ file.id }}">{{ file.name }}</option>
+                {% endfor %}
+            </select>
+        </div>
     
-        <label for="num_questions">Número de preguntas:</label>
-        <input type="number" name="num_questions" id="num_questions" min="5" max="20" value="5">
-    
-        <button type="submit">Generar Test</button>
+        <div class="form-group mt-2">
+            <label for="num_questions">Número de preguntas:</label>
+            <input type="number" name="num_questions" id="num_questions" min="5" max="20" value="5" class="form-control mx-2">
+        </div>
+        <button type="submit" class="btn btn-primary mt-2">Generar Test</button>
     </form>
     {% else %}
         <li>No tienes test creados todavía.</li>

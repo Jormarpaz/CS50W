@@ -1,0 +1,23 @@
+{% extends "Capstone/layout.html" %}
+
+{% block title %}
+    Archivos en {{ folder.name }}
+{% endblock %}
+
+{% block body %}
+<div class="container mt-4">
+    <h1>Archivos en {{ folder.name }}</h1>
+    <ul>
+        {% for file in files %}
+            <li>
+                <a href="{{ file.file.url }}">{{ file.name }}</a> - Subido el {{ file.date }}
+                {% if file.tags %}
+                    <span class="badge badge-info">{{ file.tags }}</span>
+                {% endif %}
+            </li>
+        {% endfor %}
+    </ul>
+    <a class="btn btn-secondary" href="{% url 'file-upload-folder' folder.id %}">Subir un archivo</a>
+    <a class="btn btn-secondary" href="{% url 'files' %}">Volver a Mis Archivos</a>
+</div>
+{% endblock %}

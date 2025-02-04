@@ -11,7 +11,10 @@ urlpatterns = [
     path('register/', views.register, name='register'),
 
     path('files/', views.files, name='files'),
-    path('upload/', views.upload_file, name='file-upload'),
+    path('files/upload/', views.upload_file, name='file-upload'),
+    path('files/upload/<int:folder_id>/', views.upload_file, name='file-upload-folder'),
+    path('folders/create/', views.create_folder, name='create_folder'),
+    path('folders/<int:folder_id>/', views.folder_files, name='folder_files'),
 
     path('calendar/', views.calendar, name='calendar'),
 
@@ -19,4 +22,5 @@ urlpatterns = [
 
     path('tests/', views.select_file_for_test, name='tests'),
     path('generate-test/', views.generate_test, name='generate-test'),
+    path('check_answers/', views.check_answers, name='check_answers'),
 ]

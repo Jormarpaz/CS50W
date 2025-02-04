@@ -7,14 +7,25 @@
 {% block body %}
 <div class="container mt-4"">
     <h1>Mis Archivos</h1>
+
+    <h2>Carpetas</h2>
     <ul>
-        {% if user_files %}
-            {% for file in user_files %}
-                <li><a href="{{ file.file.url }}">{{ file.name }}</a> - Subido el {{ file.date }}</li>
-            {% endfor %}
-        {% else %}
-            <li>No tienes archivos subidos aún.</li>
-        {% endif %}
+        {% for folder in folders %}
+            <li><a href="{% url 'folder_files' folder.id %}">{{ folder.name }}</a></li>
+        {% endfor %}
     </ul>
+    <a class="btn btn-secondary" href="{% url 'create_folder' %}">Crear Carpeta</a>
+    <h2>Archivos</h2>
+    <ul>
+        {% for file in user_files %}
+            <li>
+                <a href="{{ file.file.url }}">{{ file.name }}</a> - Subido el {{ file.date }}
+                {% if file.tags %}
+                    <span class="badge badge-info">{{ file.tags }}</span>
+                {% endif %}
+            </li>
+        {% endfor %}
+    </ul>
+    <a class="btn btn-secondary" href="{% url 'file-upload' %}">Subir un archivo</a>
 </div>
 {% endblock %}

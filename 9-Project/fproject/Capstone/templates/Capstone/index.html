@@ -14,9 +14,11 @@
             <li>No tienes archivos subidos aún.</li>
         {% endfor %} 
     </ul>
-    <a href="{% url 'file-upload' %}">Subir un archivo</a>
+    <div style="display:inline-flex; gap: 5px;">
+        <a class="btn btn-secondary" href="{% url 'file-upload' %}">Subir un archivo</a>
     </br>
-    <a href="{% url 'logout' %}">Cerrar sesión</a>
+        <a class="btn btn-danger" href="{% url 'logout' %}">Cerrar sesión</a>
+    </div>
 {% else %}
     <h1>Bienvenid@!</h1>
     <p><a href="{% url 'login' %}">Iniciar sesión</a> o <a href="{% url 'register' %}">Regístrate</a> para comenzar.</p>
