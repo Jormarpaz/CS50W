@@ -1,11 +1,12 @@
+import json
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
-from django.http import HttpResponse, HttpResponseRedirect
+from django.http import HttpResponseRedirect, JsonResponse
 from django.shortcuts import render, redirect, get_object_or_404
 from django.db import IntegrityError
 from django.contrib import messages
 from django.urls import reverse
-
+import os
 
 from .tests.generator import extract_text_from_file, extract_key_phrases, generate_questions
 from .models import User, File, Test, Folder
@@ -13,17 +14,73 @@ from . import forms
 
 # Create your views here.
 def index(request):
-    user_files = File.objects.filter(
-        user=request.user).order_by("-date")
-    return render(request, "Capstone/index.html", {
-        "user_files": user_files,
-    })
+    if request.user.is_authenticated:
+        user_files = File.objects.filter(
+            user=request.user).order_by("-date")
+        return render(request, "Capstone/index.html", {
+            "user_files": user_files,
+        })
+    else:
+        return render(request, "Capstone/index.html")
     
 # *************************************************************
 # *************************************************************
 # *********************** Archivos ****************************
 # *************************************************************
 # *************************************************************
+
+@login_required
+def delete_file(request):
+    if request.method == "POST":
+        try:
+            data = json.loads(request.body)
+            file_id = data.get("file_id")
+
+            file = File.objects.get(id=file_id)
+            file_path = file.file.path  # Ruta del archivo en el sistema
+
+            if os.path.exists(file_path):
+                os.remove(file_path)  # Borrar archivo físico
+
+            file.delete()  # Borrar de la base de datos
+
+            return JsonResponse({"success": True})
+        except File.DoesNotExist:
+            return JsonResponse({"success": False, "error": "Archivo no encontrado"}, status=404)
+        except Exception as e:
+            return JsonResponse({"success": False, "error": str(e)}, status=400)
+
+    return JsonResponse({"success": False, "error": "Método no permitido"}, status=405)
+
+@login_required
+def delete_folder(request):
+    if request.method == "POST":
+        try:
+            data = json.loads(request.body)
+            folder_id = data.get("folder_id")
+
+            folder = Folder.objects.get(id=folder_id)
+
+            # Eliminar archivos dentro de la carpeta
+            files = File.objects.filter(folder=folder)
+            for file in files:
+                file_path = file.file.path
+                if os.path.exists(file_path):
+                    os.remove(file_path)
+                file.delete()
+
+            # Eliminar subcarpetas primero
+            Folder.objects.filter(parent=folder).delete()
+
+            folder.delete()  # Finalmente, eliminar la carpeta
+
+            return JsonResponse({"success": True})
+        except Folder.DoesNotExist:
+            return JsonResponse({"success": False, "error": "Carpeta no encontrada"}, status=404)
+        except Exception as e:
+            return JsonResponse({"success": False, "error": str(e)}, status=400)
+
+    return JsonResponse({"success": False, "error": "Método no permitido"}, status=405)
 
 @login_required
 def upload_file(request, folder_id=None):
@@ -52,9 +109,11 @@ def files(request):
     folders = Folder.objects.filter(user=request.user)
     user_files = File.objects.filter(
         user=request.user, folder__isnull=True).order_by("-date")
+    folder_files = {folder.id: File.objects.filter(folder=folder) for folder in folders}
     return render(request, "Capstone/files.html", {
         "folders": folders,
         "user_files": user_files,
+        "folder_files": folder_files
     })
 
 @login_required
@@ -82,7 +141,6 @@ def create_folder(request):
 # ********************** Calendario ***************************
 # *************************************************************
 # *************************************************************
-
 
 @login_required
 def calendar(request):

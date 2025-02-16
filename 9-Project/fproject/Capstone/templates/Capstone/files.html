@@ -1,31 +1,57 @@
 {% extends "Capstone/layout.html" %}
+{% load custom_filters %}
 
 {% block title %}
     Mis Archivos
 {% endblock %}
 
 {% block body %}
-<div class="container mt-4"">
+<div class="container mt-4">
     <h1>Mis Archivos</h1>
 
     <h2>Carpetas</h2>
     <ul>
         {% for folder in folders %}
-            <li><a href="{% url 'folder_files' folder.id %}">{{ folder.name }}</a></li>
+        <li class="folder">
+                <a href="{% url 'folder_files' folder.id %}">{{ folder.name }}</a>
+                <ul>
+                    {% for file in folder_files|get_item:folder.id %}
+                    <li class="file">
+                            <a href="{{ file.file.url }}">{{ file.name }}</a> - Subido el {{ file.date }}
+                            {% if file.tags %}
+                                <span class="badge badge-info">{{ file.tags }}</span>
+                            {% endif %}
+                        </li>
+                    {% empty %}
+                        <li>(Vacía)</li>
+                    {% endfor %}
+                </ul>
+            </li>
         {% endfor %}
     </ul>
-    <a class="btn btn-secondary" href="{% url 'create_folder' %}">Crear Carpeta</a>
+    
     <h2>Archivos</h2>
-    <ul>
+    <ul id="root-folder">
         {% for file in user_files %}
-            <li>
+        <li class="file">
                 <a href="{{ file.file.url }}">{{ file.name }}</a> - Subido el {{ file.date }}
                 {% if file.tags %}
                     <span class="badge badge-info">{{ file.tags }}</span>
                 {% endif %}
             </li>
+        {% empty %}
+            <p>No hay archivos en la raíz</p>
         {% endfor %}
     </ul>
-    <a class="btn btn-secondary" href="{% url 'file-upload' %}">Subir un archivo</a>
+    <div class="d-flex flex-column">
+        <div class="d-flex justify-content-start mt-2">
+            <a class="btn btn-secondary" href="{% url 'file-upload' %}">Subir Archivo</a>
+            <button class="btn btn-danger btn-sm" onclick="deleteFile('{{ file.id }}')">Eliminar Archivo</button>
+        </div>
+        <div class="d-flex justify-content-start mt-1">
+            <a class="btn btn-secondary" href="{% url 'create_folder' %}">Crear Carpeta</a>
+            <button class="btn btn-danger btn-sm" onclick="deleteFolder('{{ folder.id }}')">Eliminar Carpeta</button>
+        </div>
+    </div>
 </div>
 {% endblock %}

@@ -16,6 +16,9 @@ urlpatterns = [
     path('folders/create/', views.create_folder, name='create_folder'),
     path('folders/<int:folder_id>/', views.folder_files, name='folder_files'),
 
+    path('borrar_archivo/',views.delete_file, name='delete_file'),
+    path('borrar_carpeta/',views.delete_folder, name='delete_folder'),
+
     path('calendar/', views.calendar, name='calendar'),
 
     path('contact/', views.contact, name='contact'),
