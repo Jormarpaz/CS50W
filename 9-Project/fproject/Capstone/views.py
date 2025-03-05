@@ -73,14 +73,16 @@ def delete_file(request):
     
 @login_required
 def files(request):
-    folders = Folder.objects.filter(user=request.user)
+    folders = Folder.objects.filter(user=request.user, parent__isnull=True)
+    subfolders = Folder.objects.filter(user=request.user, parent__isnull=False)
     user_files = File.objects.filter(
         user=request.user, folder__isnull=True).order_by("-date")
-    folder_files = {folder.id: File.objects.filter(folder=folder) for folder in folders}
+    folder_files = {folder.id: File.objects.filter(folder=folder) for folder in Folder.objects.filter(user=request.user)}
     return render(request, "Capstone/files.html", {
         "folders": folders,
         "user_files": user_files,
-        "folder_files": folder_files
+        "folder_files": folder_files,
+        "subfolders": subfolders
     })
 
 @login_required
@@ -138,6 +140,40 @@ def delete_folder(request):
             return JsonResponse({"success": False, "error": "Carpeta no encontrada"}, status=404)
         except Exception as e:
             print("Error en delete_folder:", e)
+            return JsonResponse({"success": False, "error": str(e)}, status=400)
+    return JsonResponse({"success": False, "error": "Método no permitido"}, status=405)
+
+# *************************************************************
+# *************************************************************
+# *********************** Arrastre ****************************
+# *************************************************************
+# *************************************************************
+
+@login_required
+def move_file(request):
+    if request.method == "POST":
+        try:
+            data = json.loads(request.body)
+            file_id = data.get("file_id")
+            folder_id = data.get("folder_id")
+
+            if not file_id:
+                return JsonResponse({"success": False, "error": "ID de archivo no proporcionado"}, status=400)
+
+            file = File.objects.get(id=file_id, user=request.user)
+            if folder_id:
+                folder = Folder.objects.get(id=folder_id, user=request.user)
+                file.folder = folder
+            else:
+                file.folder = None
+            file.save()
+
+            return JsonResponse({"success": True})
+        except File.DoesNotExist:
+            return JsonResponse({"success": False, "error": "Archivo no encontrado"}, status=404)
+        except Folder.DoesNotExist:
+            return JsonResponse({"success": False, "error": "Carpeta no encontrada"}, status=404)
+        except Exception as e:
             return JsonResponse({"success": False, "error": str(e)}, status=400)
     return JsonResponse({"success": False, "error": "Método no permitido"}, status=405)
 

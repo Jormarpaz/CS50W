@@ -12,11 +12,7 @@
   <form style="width: 75%;" method="post" autocomplete="off" action="{% url 'file-upload' %}" enctype="multipart/form-data"> 
     {% csrf_token %}
     {{ form.as_p }}
-    {% if not folder %}
-      <div class="form-group">
-        {{ form.folder.label_tag }} {{ form.folder }}
-      </div>
-    {% endif %}
+    
     <button type="submit" class="btn btn-primary">Subir</button>
   </form>
   <a class="btn btn-secondary" href="{% url 'files' %}">Volver a Mis Archivos</a>

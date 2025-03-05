@@ -8,13 +8,28 @@
   <h2>Carpetas</h2>
   <ul>
     {% for folder in folders %}
-    <li class="folder">
+    <li class="folder" ondrop="drop(event)" ondragover="allowDrop(event)" data-folder-id="{{ folder.id }}">
       <input type="checkbox" class="delete-checkbox" value="{{ folder.id }}" style="display: none" data-type="folder" />
       <a href="{% url 'folder_files' folder.id %}">{{ folder.name }}</a>
       <ul>
+
+        {% for subfolder in subfolders}
+          {% if subfolder.parent_id == folder.id %}
+            <li class="folder" ondrop="drop(event)" ondragover="allowDrop(event)" data-folder-id="{{ subfolder.id }}">
+              <input type="checkbox" class="delete-checkbox" value="{{ subfolder.id }}" style="display: none" data-type="folder" />
+              <a href="{% url 'folder_files' subfolder.id %}">{{ subfolder.name }}</a>
+            </li>
+          {% endif %}
+        {% endfor %}
+        
+        {% if not folder.subfolders.all %}
+          <li>(Vacía)</li>
+        {% endif %}
+
         {% for file in folder_files|get_item:folder.id %}
-        <li class="file">
-          <a href="{{ file.file.url }}">{{ file.name }}</a> - Subido el {{ file.date }} {% if file.tags %}
+        <li class="file" draggable="true" ondragstart="drag(event)" data-file-id="{{ file.id }}">
+          <a href="{{ file.file.url }}">{{ file.name }}</a> - {{ file.date }}
+          {% if file.tags %}
           <span class="badge badge-info">{{ file.tags }}</span>
           {% endif %}
           <input type="checkbox" class="delete-checkbox" value="{{ file.id }}" style="display: none" data-type="file" />
@@ -22,20 +37,21 @@
         {% empty %}
         <li>(Vacía)</li>
         {% endfor %}
+
       </ul>
     </li>
     {% empty %}
-      <li>
-        <p>No hay carpetas</p>
-      </li>
+    <li>
+      <p>No hay carpetas</p>
+    </li>
     {% endfor %}
   </ul>
 
   {% csrf_token %}
   <h2>Archivos en la raíz</h2>
-  <ul id="root-folder">
+  <ul id="root-folder" ondrop="drop(event)" ondragover="allowDrop(event)">
     {% for file in user_files %}
-    <li class="file">
+    <li class="file" draggable="true" ondragstart="drag(event)" data-file-id="{{ file.id }}">
       <a href="{{ file.file.url }}">{{ file.name }}</a> - {{ file.date }} {% if file.tags %}
       <span class="badge badge-info">{{ file.tags }}</span>
       {% endif %}
@@ -64,6 +80,48 @@
 </div>
 
 <script>
+
+  function allowDrop(event) {
+    event.preventDefault();
+  }
+
+  function drag(event) {
+    const fileElement = event.target.closest(".file");
+    if (!fileElement) return;
+
+    const fileId = fileElement.dataset.fileId;
+    event.dataTransfer.setData("text", fileId);
+
+  }
+
+  function drop(event) {
+    event.preventDefault();
+    const fileId = event.dataTransfer.getData("text");
+    const targetFolderElement = event.target.closest(".folder");
+    const targetFolderId = targetFolderElement ? targetFolderElement.dataset.folderId : null;
+
+    fetch("{% url 'move_file' %}", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "X-CSRFToken": "{{ csrf_token }}",
+      },
+      body: JSON.stringify({ file_id: fileId, folder_id: targetFolderId }),
+    })
+      .then(response => response.json())
+      .then(data => {
+        if (data.success) {
+          location.reload(); // Recargar la página para reflejar los cambios
+        } else {
+          console.error("Error al mover el archivo:", data.error);
+        }
+      })
+      .catch(error => {
+        console.error("Error en la solicitud de mover archivo:", error);
+      });
+  }
+
+
   function toggleFileCheckboxes() {
     const checkboxes = document.querySelectorAll(".delete-checkbox[data-type='file']");
     const confirmButton = document.getElementById("confirm-delete");
@@ -121,25 +179,34 @@
         },
         body: JSON.stringify({ [`${type}_id`]: id }),
       })
-      .then(response => response.json())
-      .then(data => {
-        if (data.success) {
-          const checkbox = document.querySelector(`.delete-checkbox[value="${id}"]`);
-          if (checkbox) {
-            checkbox.parentElement.remove();
+        .then(response => response.json())
+        .then(data => {
+          if (data.success) {
+            const checkbox = document.querySelector(`.delete-checkbox[value="${id}"]`);
+            if (checkbox) {
+              checkbox.parentElement.remove();
+            }
+          } else {
+            console.error(`Error al eliminar ${type}:`, data.error);
           }
-        } else {
-          console.error(`Error al eliminar ${type}:`, data.error);
-        }
-      })
-      .catch(error => {
-        console.error(`Error en la solicitud de eliminación de ${type}:`, error);
-      });
+        })
+        .catch(error => {
+          console.error(`Error en la solicitud de eliminación de ${type}:`, error);
+        });
     });
 
     Promise.all(deletePromises).then(() => {
       resetButtons();
+      checkifEmpty();
     });
+  }
+
+  function checkIfEmpty() {
+    const rootFolder = document.getElementById("root-folder");
+    const files = rootFolder.querySelectorAll(".file");
+    if (files.length === 0) {
+      rootFolder.innerHTML = "<li><p>No hay archivos en la raíz</p></li>";
+    }
   }
 
   function cancelDelete() {
