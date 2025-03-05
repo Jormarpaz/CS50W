@@ -1,57 +1,169 @@
 {% extends "Capstone/layout.html" %}
 {% load custom_filters %}
-
-{% block title %}
-    Mis Archivos
-{% endblock %}
-
+{% block title %} Mis Archivos {% endblock %}
 {% block body %}
 <div class="container mt-4">
-    <h1>Mis Archivos</h1>
+  <h1>Mis Archivos</h1>
 
-    <h2>Carpetas</h2>
-    <ul>
-        {% for folder in folders %}
-        <li class="folder">
-                <a href="{% url 'folder_files' folder.id %}">{{ folder.name }}</a>
-                <ul>
-                    {% for file in folder_files|get_item:folder.id %}
-                    <li class="file">
-                            <a href="{{ file.file.url }}">{{ file.name }}</a> - Subido el {{ file.date }}
-                            {% if file.tags %}
-                                <span class="badge badge-info">{{ file.tags }}</span>
-                            {% endif %}
-                        </li>
-                    {% empty %}
-                        <li>(Vacía)</li>
-                    {% endfor %}
-                </ul>
-            </li>
-        {% endfor %}
-    </ul>
-    
-    <h2>Archivos</h2>
-    <ul id="root-folder">
-        {% for file in user_files %}
+  <h2>Carpetas</h2>
+  <ul>
+    {% for folder in folders %}
+    <li class="folder">
+      <input type="checkbox" class="delete-checkbox" value="{{ folder.id }}" style="display: none" data-type="folder" />
+      <a href="{% url 'folder_files' folder.id %}">{{ folder.name }}</a>
+      <ul>
+        {% for file in folder_files|get_item:folder.id %}
         <li class="file">
-                <a href="{{ file.file.url }}">{{ file.name }}</a> - Subido el {{ file.date }}
-                {% if file.tags %}
-                    <span class="badge badge-info">{{ file.tags }}</span>
-                {% endif %}
-            </li>
+          <a href="{{ file.file.url }}">{{ file.name }}</a> - Subido el {{ file.date }} {% if file.tags %}
+          <span class="badge badge-info">{{ file.tags }}</span>
+          {% endif %}
+          <input type="checkbox" class="delete-checkbox" value="{{ file.id }}" style="display: none" data-type="file" />
+        </li>
         {% empty %}
-            <p>No hay archivos en la raíz</p>
+        <li>(Vacía)</li>
         {% endfor %}
-    </ul>
-    <div class="d-flex flex-column">
-        <div class="d-flex justify-content-start mt-2">
-            <a class="btn btn-secondary" href="{% url 'file-upload' %}">Subir Archivo</a>
-            <button class="btn btn-danger btn-sm" onclick="deleteFile('{{ file.id }}')">Eliminar Archivo</button>
-        </div>
-        <div class="d-flex justify-content-start mt-1">
-            <a class="btn btn-secondary" href="{% url 'create_folder' %}">Crear Carpeta</a>
-            <button class="btn btn-danger btn-sm" onclick="deleteFolder('{{ folder.id }}')">Eliminar Carpeta</button>
-        </div>
+      </ul>
+    </li>
+    {% empty %}
+      <li>
+        <p>No hay carpetas</p>
+      </li>
+    {% endfor %}
+  </ul>
+
+  {% csrf_token %}
+  <h2>Archivos en la raíz</h2>
+  <ul id="root-folder">
+    {% for file in user_files %}
+    <li class="file">
+      <a href="{{ file.file.url }}">{{ file.name }}</a> - {{ file.date }} {% if file.tags %}
+      <span class="badge badge-info">{{ file.tags }}</span>
+      {% endif %}
+      <input type="checkbox" class="delete-checkbox" value="{{ file.id }}" style="display: none" data-type="file" />
+    </li>
+    {% empty %}
+    <li>
+      <p>No hay archivos en la raíz</p>
+    </li>
+    {% endfor %}
+  </ul>
+  <div class="d-flex flex-column">
+    <div class="d-flex justify-content-start mt-2">
+      <a class="btn btn-secondary" href="{% url 'file-upload' %}">Subir Archivo</a>
+      <button class="btn btn-danger btn-sm" onclick="toggleFileCheckboxes()">Eliminar Archivo</button>
+      <button type="button" class="btn btn-danger" onclick="confirmDelete()" style="display: none"
+        id="confirm-delete">Confirmar</button>
+      <button type="button" class="btn btn-secondary" onclick="cancelDelete()" style="display: none"
+        id="cancel-delete">Cancelar</button>
     </div>
+    <div class="d-flex justify-content-start mt-1">
+      <a class="btn btn-secondary" href="{% url 'create_folder' %}">Crear Carpeta</a>
+      <button class="btn btn-danger btn-sm" onclick="toggleFolderCheckboxes()">Eliminar Carpeta</button>
+    </div>
+  </div>
 </div>
+
+<script>
+  function toggleFileCheckboxes() {
+    const checkboxes = document.querySelectorAll(".delete-checkbox[data-type='file']");
+    const confirmButton = document.getElementById("confirm-delete");
+    const cancelButton = document.getElementById("cancel-delete");
+    const deleteButton = document.querySelector("button[onclick='toggleFileCheckboxes()']");
+    const folderDeleteButton = document.querySelector("button[onclick='toggleFolderCheckboxes()']");
+    const uploadButton = document.querySelector("a[href='{% url 'file-upload' %}']");
+    const createFolderButton = document.querySelector("a[href='{% url 'create_folder' %}']");
+
+    checkboxes.forEach((checkbox) => {
+      checkbox.style.display = checkbox.style.display === "none" ? "inline-block" : "none";
+    });
+    confirmButton.style.display = "inline-block";
+    cancelButton.style.display = "inline-block";
+    deleteButton.style.display = "none";
+    folderDeleteButton.style.display = "none";
+    uploadButton.style.display = "none";
+    createFolderButton.style.display = "none";
+  }
+
+  function toggleFolderCheckboxes() {
+    const checkboxes = document.querySelectorAll(".delete-checkbox[data-type='folder']");
+    const confirmButton = document.getElementById("confirm-delete");
+    const cancelButton = document.getElementById("cancel-delete");
+    const deleteButton = document.querySelector("button[onclick='toggleFileCheckboxes()']");
+    const folderDeleteButton = document.querySelector("button[onclick='toggleFolderCheckboxes()']");
+    const uploadButton = document.querySelector("a[href='{% url 'file-upload' %}']");
+    const createFolderButton = document.querySelector("a[href='{% url 'create_folder' %}']");
+
+    checkboxes.forEach((checkbox) => {
+      checkbox.style.display = checkbox.style.display === "none" ? "inline-block" : "none";
+    });
+    confirmButton.style.display = "inline-block";
+    cancelButton.style.display = "inline-block";
+    deleteButton.style.display = "none";
+    folderDeleteButton.style.display = "none";
+    uploadButton.style.display = "none";
+    createFolderButton.style.display = "none";
+  }
+
+  function confirmDelete() {
+    const checkboxes = document.querySelectorAll(".delete-checkbox:checked");
+    const ids = Array.from(checkboxes).map((checkbox) => checkbox.value);
+    const types = Array.from(checkboxes).map((checkbox) => checkbox.dataset.type);
+
+    const deletePromises = ids.map((id, index) => {
+      const type = types[index];
+      const url = type === "file" ? "{% url 'delete_file' %}" : "{% url 'delete_folder' %}";
+
+      return fetch(url, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "X-CSRFToken": "{{ csrf_token }}",
+        },
+        body: JSON.stringify({ [`${type}_id`]: id }),
+      })
+      .then(response => response.json())
+      .then(data => {
+        if (data.success) {
+          const checkbox = document.querySelector(`.delete-checkbox[value="${id}"]`);
+          if (checkbox) {
+            checkbox.parentElement.remove();
+          }
+        } else {
+          console.error(`Error al eliminar ${type}:`, data.error);
+        }
+      })
+      .catch(error => {
+        console.error(`Error en la solicitud de eliminación de ${type}:`, error);
+      });
+    });
+
+    Promise.all(deletePromises).then(() => {
+      resetButtons();
+    });
+  }
+
+  function cancelDelete() {
+    resetButtons();
+  }
+
+  function resetButtons() {
+    const checkboxes = document.querySelectorAll(".delete-checkbox");
+    const confirmButton = document.getElementById("confirm-delete");
+    const cancelButton = document.getElementById("cancel-delete");
+    const deleteButton = document.querySelector("button[onclick='toggleFileCheckboxes()']");
+    const folderDeleteButton = document.querySelector("button[onclick='toggleFolderCheckboxes()']");
+    const uploadButton = document.querySelector("a[href='{% url 'file-upload' %}']");
+    const createFolderButton = document.querySelector("a[href='{% url 'create_folder' %}']");
+
+    checkboxes.forEach((checkbox) => {
+      checkbox.style.display = "none";
+    });
+    confirmButton.style.display = "none";
+    cancelButton.style.display = "none";
+    deleteButton.style.display = "inline-block";
+    folderDeleteButton.style.display = "inline-block";
+    uploadButton.style.display = "inline-block";
+    createFolderButton.style.display = "inline-block";
+  }
+</script>
 {% endblock %}

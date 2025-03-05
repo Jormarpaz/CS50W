@@ -8,8 +8,7 @@ from django.contrib import messages
 from django.urls import reverse
 import os
 
-from .tests.generator import extract_text_from_file, extract_key_phrases, generate_questions
-from .models import User, File, Test, Folder
+from .models import User, File, Folder
 from . import forms
 
 # Create your views here.
@@ -28,59 +27,6 @@ def index(request):
 # *********************** Archivos ****************************
 # *************************************************************
 # *************************************************************
-
-@login_required
-def delete_file(request):
-    if request.method == "POST":
-        try:
-            data = json.loads(request.body)
-            file_id = data.get("file_id")
-
-            file = File.objects.get(id=file_id)
-            file_path = file.file.path  # Ruta del archivo en el sistema
-
-            if os.path.exists(file_path):
-                os.remove(file_path)  # Borrar archivo físico
-
-            file.delete()  # Borrar de la base de datos
-
-            return JsonResponse({"success": True})
-        except File.DoesNotExist:
-            return JsonResponse({"success": False, "error": "Archivo no encontrado"}, status=404)
-        except Exception as e:
-            return JsonResponse({"success": False, "error": str(e)}, status=400)
-
-    return JsonResponse({"success": False, "error": "Método no permitido"}, status=405)
-
-@login_required
-def delete_folder(request):
-    if request.method == "POST":
-        try:
-            data = json.loads(request.body)
-            folder_id = data.get("folder_id")
-
-            folder = Folder.objects.get(id=folder_id)
-
-            # Eliminar archivos dentro de la carpeta
-            files = File.objects.filter(folder=folder)
-            for file in files:
-                file_path = file.file.path
-                if os.path.exists(file_path):
-                    os.remove(file_path)
-                file.delete()
-
-            # Eliminar subcarpetas primero
-            Folder.objects.filter(parent=folder).delete()
-
-            folder.delete()  # Finalmente, eliminar la carpeta
-
-            return JsonResponse({"success": True})
-        except Folder.DoesNotExist:
-            return JsonResponse({"success": False, "error": "Carpeta no encontrada"}, status=404)
-        except Exception as e:
-            return JsonResponse({"success": False, "error": str(e)}, status=400)
-
-    return JsonResponse({"success": False, "error": "Método no permitido"}, status=405)
 
 @login_required
 def upload_file(request, folder_id=None):
@@ -103,6 +49,27 @@ def upload_file(request, folder_id=None):
         "form": form,
         "folder": folder,
     })
+
+@login_required
+def delete_file(request):
+    if request.method == "POST":
+        try:
+            data = json.loads(request.body)
+            file_id = data.get("file_id")
+
+            file = File.objects.get(id=file_id)
+
+            file_path = file.file.path
+            if os.path.exists(file_path):
+                os.remove(file_path)
+            file.delete()
+
+            return JsonResponse({"success": True})
+        except File.DoesNotExist:
+            return JsonResponse({"success": False, "error": "Archivo no encontrado"}, status=404)
+        except Exception as e:
+            return JsonResponse({"success": False, "error": str(e)}, status=400)
+    return JsonResponse({"success": False, "error": "Método no permitido"}, status=405)
     
 @login_required
 def files(request):
@@ -135,6 +102,44 @@ def create_folder(request):
         form = forms.FolderForm()
     return render(request, "Capstone/create_folder.html", {"form": form})
 
+@login_required
+def delete_folder(request):
+    if request.method == "POST":
+        try:
+            data = json.loads(request.body)
+            print("Datos recibidos:", data)
+            folder_id = data.get("folder_id")
+
+            if not folder_id:
+                return JsonResponse({"success": False, "error": "ID de carpeta no proporcionado"}, status=400)
+
+            folder = Folder.objects.get(id=folder_id)    
+
+            files = File.objects.filter(folder=folder)
+            if files.exists():
+                for file in files:
+                    file_path = file.file.path
+                    if os.path.exists(file_path):
+                        os.remove(file_path)
+                    file.delete()
+            
+            def delete_subfolders(folder):
+                subfolders = Folder.objects.filter(parent=folder)
+                for subfolder in subfolders:
+                    delete_subfolders(subfolder)
+                    subfolder.delete()
+
+            delete_subfolders(folder)
+
+            folder.delete()
+
+            return JsonResponse({"success": True})
+        except Folder.DoesNotExist:
+            return JsonResponse({"success": False, "error": "Carpeta no encontrada"}, status=404)
+        except Exception as e:
+            print("Error en delete_folder:", e)
+            return JsonResponse({"success": False, "error": str(e)}, status=400)
+    return JsonResponse({"success": False, "error": "Método no permitido"}, status=405)
 
 # *************************************************************
 # *************************************************************
@@ -149,60 +154,6 @@ def calendar(request):
     return render(request, "Capstone/calendar.html", {
         "events": user_events,
     })
-
-# *************************************************************
-# *************************************************************
-# ************************ Tests ******************************
-# *************************************************************
-# *************************************************************
-@login_required
-def select_file_for_test(request):
-    user_files = File.objects.filter(user=request.user)  # Archivos del usuario autenticado
-    return render(request, "Capstone/tests.html", {"user_files": user_files})
-
-@login_required
-def generate_test(request):
-    file_id = request.GET.get("file_id")  # Obtener el ID del archivo seleccionado
-    num_questions = int(request.GET.get("num_questions", 5))  # Número de preguntas (por defecto 5)
-
-    if not file_id:
-        return redirect("tests")  # Si no se seleccionó archivo, redirigir a la selección
-
-    file = get_object_or_404(File, id=file_id, user=request.user)  # Asegurar que el archivo pertenece al usuario
-    file_path = file.file.path  # Ruta del archivo
-    text = extract_text_from_file(file_path)  # Extraer el texto del archivo
-
-    questions = generate_questions(text, num_questions)  # Generar preguntas
-
-    # Guardar el test en la base de datos
-    test = Test.objects.create(user=request.user, file=file, questions=questions)
-
-    return render(request, "Capstone/test.html", {"test": test})
-
-
-@login_required
-def check_answers(request):
-    if request.method == "POST":
-        test_id = request.POST.get("test_id")
-        test = Test.objects.get(id=test_id, user=request.user)
-        correct_answers = 0
-        correct_answer_texts = []
-
-        for question in test.questions:
-            selected_option_id = request.POST.get(f"question_{question['id']}")
-            correct_option = next(option for option in question['options'] if option['is_correct'])
-            correct_answer_texts.append(correct_option['text'])
-            if selected_option_id and int(selected_option_id) == correct_option['id']:
-                correct_answers += 1
-
-        return render(request, "Capstone/results.html", {
-            "test": test,
-            "correct_answers": correct_answers,
-            "total_questions": len(test.questions),
-            "correct_answer_texts": correct_answer_texts,
-        })
-
-    return redirect("index")
 
 # *************************************************************
 # *************************************************************
