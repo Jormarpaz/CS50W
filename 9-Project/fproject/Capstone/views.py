@@ -2,6 +2,7 @@ import json
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
 from django.http import HttpResponseRedirect, JsonResponse
+from django.views.decorators.http import require_POST
 from django.shortcuts import render, redirect, get_object_or_404
 from django.db import IntegrityError
 from django.contrib import messages
@@ -51,25 +52,24 @@ def upload_file(request, folder_id=None):
     })
 
 @login_required
+@require_POST
 def delete_file(request):
-    if request.method == "POST":
-        try:
-            data = json.loads(request.body)
-            file_id = data.get("file_id")
+    data = json.loads(request.body)
+    file_id = data.get('file_id')
+    if not file_id:
+        return JsonResponse({'success': False, 'error': 'ID de archivo no proporcionado'}, status=400)
 
-            file = File.objects.get(id=file_id)
-
-            file_path = file.file.path
-            if os.path.exists(file_path):
-                os.remove(file_path)
-            file.delete()
-
-            return JsonResponse({"success": True})
-        except File.DoesNotExist:
-            return JsonResponse({"success": False, "error": "Archivo no encontrado"}, status=404)
-        except Exception as e:
-            return JsonResponse({"success": False, "error": str(e)}, status=400)
-    return JsonResponse({"success": False, "error": "Método no permitido"}, status=405)
+    try:
+        file = File.objects.get(id=file_id)
+        file_path = file.file.path
+        if os.path.exists(file_path):
+            os.remove(file_path)
+        file.delete()
+        return JsonResponse({'success': True})
+    except File.DoesNotExist:
+        return JsonResponse({'success': False, 'error': 'Archivo no encontrado'}, status=404)
+    except Exception as e:
+        return JsonResponse({'success': False, 'error': str(e)}, status=500)
     
 @login_required
 def files(request):

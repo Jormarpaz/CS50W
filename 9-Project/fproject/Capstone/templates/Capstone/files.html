@@ -7,55 +7,81 @@
 
   <h2>Carpetas</h2>
   <ul>
+    <!-- Carpetas -->
     {% for folder in folders %}
     <li class="folder" ondrop="drop(event)" ondragover="allowDrop(event)" data-folder-id="{{ folder.id }}">
-      <input type="checkbox" class="delete-checkbox" value="{{ folder.id }}" style="display: none" data-type="folder" />
-      <a href="{% url 'folder_files' folder.id %}">{{ folder.name }}</a>
+      <label>
+        <input type="checkbox" class="delete-checkbox" value="{{ folder.id }}" style="display: none" data-type="folder" />
+        <a href="{% url 'folder_files' folder.id %}">{{ folder.name }}</a>
+      </label>
       <ul>
-
-        {% for subfolder in subfolders}
+        <!-- Subcarpetas -->
+        {% for subfolder in subfolders %}
           {% if subfolder.parent_id == folder.id %}
-            <li class="folder" ondrop="drop(event)" ondragover="allowDrop(event)" data-folder-id="{{ subfolder.id }}">
-              <input type="checkbox" class="delete-checkbox" value="{{ subfolder.id }}" style="display: none" data-type="folder" />
+          <li class="folder" ondrop="drop(event)" ondragover="allowDrop(event)" data-folder-id="{{ subfolder.id }}">
+            <label>
+              <input type="checkbox" class="delete-checkbox" value="{{ subfolder.id }}" style="display: none"
+                data-type="folder" />
               <a href="{% url 'folder_files' subfolder.id %}">{{ subfolder.name }}</a>
-            </li>
+            </label>
+            <ul>
+              {% with folder_files|get_item:subfolder.id as subfolder_files %}
+                {% if subfolder_files %}
+                  <!-- Archivos en la subcarpeta -->
+                  {% for file in subfolder_files %}
+                  <li class="file" draggable="true" ondragstart="drag(event)" data-file-id="{{ file.id }}">
+                    <label>
+                      <input type="checkbox" class="delete-checkbox" value="{{ file.id }}" style="display: none" data-type="file" />
+                      <a href="{{ file.file.url }}">{{ file.name }}</a> - {{ file.date }}
+                    </label>
+                    {% if file.tags %}
+                      <span class="badge badge-info">{{ file.tags }}</span>
+                    {% endif %}
+                  </li>
+                  {% endfor %}
+                {% else %}
+                  <li class="empty-message">(Vacía)</li>
+                {% endif %}
+              {% endwith %}
+            </ul>
+          </li>
           {% endif %}
         {% endfor %}
-        
-        {% if not folder.subfolders.all %}
-          <li>(Vacía)</li>
-        {% endif %}
-
-        {% for file in folder_files|get_item:folder.id %}
-        <li class="file" draggable="true" ondragstart="drag(event)" data-file-id="{{ file.id }}">
-          <a href="{{ file.file.url }}">{{ file.name }}</a> - {{ file.date }}
-          {% if file.tags %}
-          <span class="badge badge-info">{{ file.tags }}</span>
-          {% endif %}
-          <input type="checkbox" class="delete-checkbox" value="{{ file.id }}" style="display: none" data-type="file" />
-        </li>
-        {% empty %}
-        <li>(Vacía)</li>
-        {% endfor %}
-
-      </ul>
+    <!-- Archivos en la carpeta -->
+    {% for file in folder_files|get_item:folder.id %}
+    <li class="file" draggable="true" ondragstart="drag(event)" data-file-id="{{ file.id }}">
+      
+      <label>
+        <input type="checkbox" class="delete-checkbox" value="{{ file.id }}" style="display: none" data-type="file" />
+        <a href="{{ file.file.url }}">{{ file.name }}</a> - {{ file.date }}
+      </label>
+      {% if file.tags %}
+      <span class="badge badge-info">{{ file.tags }}</span>
+      {% endif %}
     </li>
     {% empty %}
-    <li>
-      <p>No hay carpetas</p>
-    </li>
+    <li class="empty-message">(Vacía)</li>
     {% endfor %}
   </ul>
-
+  </li>
+  {% empty %}
+  <li>
+    <p>No hay carpetas</p>
+  </li>
+  {% endfor %}
+  </ul>
   {% csrf_token %}
   <h2>Archivos en la raíz</h2>
   <ul id="root-folder" ondrop="drop(event)" ondragover="allowDrop(event)">
     {% for file in user_files %}
     <li class="file" draggable="true" ondragstart="drag(event)" data-file-id="{{ file.id }}">
-      <a href="{{ file.file.url }}">{{ file.name }}</a> - {{ file.date }} {% if file.tags %}
+      <label>
+        <input type="checkbox" class="delete-checkbox" value="{{ file.id }}" style="display: none" data-type="file" />
+        <a href="{{ file.file.url }}">{{ file.name }}</a> - {{ file.date }} 
+      </label>
+      {% if file.tags %}
       <span class="badge badge-info">{{ file.tags }}</span>
       {% endif %}
-      <input type="checkbox" class="delete-checkbox" value="{{ file.id }}" style="display: none" data-type="file" />
     </li>
     {% empty %}
     <li>
@@ -80,7 +106,9 @@
 </div>
 
 <script>
-
+  //
+  // Funciones para arrastrar y soltar archivos 
+  //
   function allowDrop(event) {
     event.preventDefault();
   }
@@ -120,8 +148,9 @@
         console.error("Error en la solicitud de mover archivo:", error);
       });
   }
-
-
+  //
+  // Funciones para eliminar archivos y carpetas
+  //
   function toggleFileCheckboxes() {
     const checkboxes = document.querySelectorAll(".delete-checkbox[data-type='file']");
     const confirmButton = document.getElementById("confirm-delete");
@@ -168,53 +197,40 @@
     const types = Array.from(checkboxes).map((checkbox) => checkbox.dataset.type);
 
     const deletePromises = ids.map((id, index) => {
-      const type = types[index];
-      const url = type === "file" ? "{% url 'delete_file' %}" : "{% url 'delete_folder' %}";
+        const type = types[index];
+        const url = type === "file" ? "{% url 'delete_file' %}" : "{% url 'delete_folder' %}";
 
-      return fetch(url, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          "X-CSRFToken": "{{ csrf_token }}",
-        },
-        body: JSON.stringify({ [`${type}_id`]: id }),
-      })
+        return fetch(url, {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+                "X-CSRFToken": "{{ csrf_token }}",
+            },
+            body: JSON.stringify({ [`${type}_id`]: id }),
+        })
         .then(response => response.json())
         .then(data => {
-          if (data.success) {
-            const checkbox = document.querySelector(`.delete-checkbox[value="${id}"]`);
-            if (checkbox) {
-              checkbox.parentElement.remove();
+            if (data.success) {
+                const checkbox = document.querySelector(`.delete-checkbox[value="${id}"]`);
+                if (checkbox) {
+                    checkbox.parentElement.remove();
+                }
+            } else {
+                console.error(`Error al eliminar ${type}:`, data.error);
             }
-          } else {
-            console.error(`Error al eliminar ${type}:`, data.error);
-          }
         })
         .catch(error => {
-          console.error(`Error en la solicitud de eliminación de ${type}:`, error);
+            console.error(`Error en la solicitud de eliminación de ${type}:`, error);
         });
     });
 
     Promise.all(deletePromises).then(() => {
-      resetButtons();
-      checkifEmpty();
+        resetButtons();
+        checkIfEmpty();  // <-- Llamamos aquí a la función después de eliminar archivos
     });
-  }
+}
 
-  function checkIfEmpty() {
-    const rootFolder = document.getElementById("root-folder");
-    const files = rootFolder.querySelectorAll(".file");
-    if (files.length === 0) {
-      rootFolder.innerHTML = "<li><p>No hay archivos en la raíz</p></li>";
-    }
-  }
-
-  function cancelDelete() {
-    resetButtons();
-  }
-
-  function resetButtons() {
-    const checkboxes = document.querySelectorAll(".delete-checkbox");
+function resetButtons() {
     const confirmButton = document.getElementById("confirm-delete");
     const cancelButton = document.getElementById("cancel-delete");
     const deleteButton = document.querySelector("button[onclick='toggleFileCheckboxes()']");
@@ -222,15 +238,86 @@
     const uploadButton = document.querySelector("a[href='{% url 'file-upload' %}']");
     const createFolderButton = document.querySelector("a[href='{% url 'create_folder' %}']");
 
-    checkboxes.forEach((checkbox) => {
-      checkbox.style.display = "none";
-    });
+    // Ocultar botones de confirmación y cancelación
     confirmButton.style.display = "none";
     cancelButton.style.display = "none";
+
+    // Mostrar botones de eliminar y otros botones
     deleteButton.style.display = "inline-block";
     folderDeleteButton.style.display = "inline-block";
     uploadButton.style.display = "inline-block";
     createFolderButton.style.display = "inline-block";
-  }
+
+    // Ocultar checkboxes
+    const checkboxes = document.querySelectorAll(".delete-checkbox");
+    checkboxes.forEach((checkbox) => {
+        checkbox.style.display = "none";
+        checkbox.checked = false;
+    });
+}
+
+
+//
+// Actualizacion estado archivos
+//
+function checkIfEmpty() {
+    // Verificar si la raíz está vacía
+    const rootFolder = document.getElementById("root-folder");
+    const filesInRoot = rootFolder.querySelectorAll(".file");
+    if (filesInRoot.length === 0) {
+        rootFolder.innerHTML = "<li><p>No hay archivos en la raíz</p></li>";
+    }
+
+    // Verificar cada carpeta si está vacía
+    document.querySelectorAll(".folder").forEach(folder => {
+        const fileList = folder.querySelectorAll(".file");
+        const subfolderList = folder.querySelectorAll(".folder");
+
+        let emptyMessage = folder.querySelector(".empty-message");
+
+        if (fileList.length === 0 && subfolderList.length === 0) {
+            if (!emptyMessage) {
+                emptyMessage = document.createElement("li");
+                emptyMessage.classList.add("empty-message");
+                emptyMessage.textContent = "(Vacía)";
+                folder.querySelector("ul").appendChild(emptyMessage);
+            }
+        } else {
+            if (emptyMessage) {
+                emptyMessage.remove();
+            }
+        }
+    });
+}
+
+// Llamar a checkIfEmpty() después de crear una subcarpeta
+document.addEventListener("DOMContentLoaded", function() {
+    const createFolderForm = document.querySelector("form[action='{% url 'create_folder' %}']");
+    if (createFolderForm) {
+        createFolderForm.addEventListener("submit", function(event) {
+            event.preventDefault();
+            fetch(createFolderForm.action, {
+                method: "POST",
+                body: new FormData(createFolderForm),
+                headers: {
+                    "X-CSRFToken": "{{ csrf_token }}",
+                },
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    location.reload(); // Recargar la página para reflejar los cambios
+                } else {
+                    console.error("Error al crear la carpeta:", data.error);
+                }
+            })
+            .catch(error => {
+                console.error("Error en la solicitud de creación de carpeta:", error);
+            });
+        });
+    }
+});
+
+
 </script>
 {% endblock %}
