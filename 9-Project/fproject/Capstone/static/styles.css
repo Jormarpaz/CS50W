@@ -75,6 +75,57 @@ a:hover {
 
 /*****************************************************/
 /*
+    Checkboxs
+*/
+/*****************************************************/
+
+/* Estilo para los contenedores de archivos y carpetas */
+.file-container, .folder-container {
+    display: flex; /* Usa flexbox para alinear elementos */
+    align-items: center; /* Centra verticalmente los elementos */
+    gap: 8px; /* Espacio entre el checkbox y el nombre */
+    white-space: nowrap; /* Evita que los elementos se rompan */
+}
+
+/* Estilo para los checkboxes */
+.delete-checkbox {
+    display: none; /* Inicialmente oculto */
+    margin: 0; /* Elimina cualquier margen */
+    padding: 0; /* Elimina cualquier padding */
+}
+
+/* Estilo para los checkboxes cuando están visibles */
+.delete-checkbox[style*="inline-block"] {
+    display: inline-block !important; /* Fuerza la visibilidad */
+}
+
+/* Estilo para los contenedores de archivos y carpetas */
+.file-container, .folder-container {
+    display: flex; /* Usa flexbox para alinear elementos */
+    align-items: center; /* Centra verticalmente los elementos */
+    gap: 8px; /* Espacio entre el checkbox y el nombre */
+}
+
+/* Estilo para los elementos <li> que contienen un checkbox visible */
+li:has(.delete-checkbox[style*="inline-block"]) {
+    display: flex; /* Aplica flex solo cuando el checkbox está visible */
+    align-items: center; /* Alinea verticalmente */
+    gap: 8px; /* Espacio entre el checkbox y el texto */
+    margin: 0;
+    padding: 0;
+}
+
+.empty-message {
+    list-style-type: disc !important; /* Fuerza el marcador */
+    display: list-item !important; /* Asegura que sea tratado como <li> */ 
+}
+
+/*****************************************************/
+/*****************************************************/
+/*****************************************************/
+
+/*****************************************************/
+/*
     Buttons 
 */
 /*****************************************************/
@@ -166,11 +217,11 @@ form {
     box-shadow: none;
 }
 
-input[type="checkbox"] {
+/*input[type="checkbox"] {
     margin-top: -38px;
     margin-left: -130px;
     transform: scale(0.5);
-}
+}*/
 
 a[id="editar"] {
     
@@ -214,6 +265,7 @@ input:focus, textarea:focus {
 ul, ol {
     margin-bottom: 20px;
     padding-left: 20px;
+    list-style-type: disc;
 }
 
 li {
