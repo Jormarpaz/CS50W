@@ -14,11 +14,28 @@
             <li>No tienes archivos subidos aún.</li>
         {% endfor %} 
     </ul>
+
+    <!-- Sección de próximos eventos -->
+    <h2>Próximos eventos:</h2>
+    <ul>
+        {% for event in upcoming_events %}
+            <li>
+                <strong>{{ event.title }}</strong> - 
+                {{ event.start|date:"d/m/Y" }}{% if event.start|time:"H:i" != "00:00" %} {{ event.start|time:"H:i" }}{% endif %}
+                {% if event.end %}
+                    a {{ event.end|date:"d/m/Y H:i" }}
+                {% endif %}
+            </li>
+        {% empty %}
+            <li>No hay eventos próximos.</li>
+        {% endfor %}
+    </ul>
+
     <div style="display:inline-flex; gap: 5px;">
         <a class="btn btn-secondary" href="{% url 'file-upload' %}">Subir un archivo</a>
-    </br>
         <a class="btn btn-danger" href="{% url 'logout' %}">Cerrar sesión</a>
     </div>
+
     {% else %}
         <h1>Bienvenid@!</h1>
         <p><a href="{% url 'login' %}">Iniciar sesión</a> o <a href="{% url 'register' %}">Regístrate</a> para comenzar.</p>

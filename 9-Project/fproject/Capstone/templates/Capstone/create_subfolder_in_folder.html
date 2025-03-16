@@ -1,0 +1,15 @@
+{% extends "Capstone/layout.html" %}
+{% block title %} Crear Subcarpeta en {{ folder.name }} {% endblock %}
+{% block body %}
+<div class="container mt-4">
+  <h1>Crear Subcarpeta en "{{ folder.name }}"</h1>
+
+  <form method="post" action="{% url 'create_subfolder_in_folder' folder.id %}">
+    {% csrf_token %}
+    {{ form.as_p }}
+    <button type="submit" class="btn btn-primary">Crear Subcarpeta</button>
+  </form>
+
+  <a href="{% url 'folder_files' folder.id %}" class="btn btn-secondary mt-2">Volver a {{ folder.name }}</a>
+</div>
+{% endblock %}

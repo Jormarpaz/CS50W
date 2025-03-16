@@ -2,14 +2,16 @@ import json
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
 from django.http import HttpResponseRedirect, JsonResponse
+from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_POST
 from django.shortcuts import render, redirect, get_object_or_404
 from django.db import IntegrityError
 from django.contrib import messages
 from django.urls import reverse
+from django.utils import timezone
 import os
 
-from .models import User, File, Folder
+from .models import User, File, Folder, Event
 from . import forms
 
 # Create your views here.
@@ -17,8 +19,11 @@ def index(request):
     if request.user.is_authenticated:
         user_files = File.objects.filter(
             user=request.user).order_by("-date")
+        now = timezone.now()
+        upcoming_events = Event.objects.filter(user=request.user, start__gte=now).order_by('start')[:4]
         return render(request, "Capstone/index.html", {
             "user_files": user_files,
+            "upcoming_events": upcoming_events,
         })
     else:
         return render(request, "Capstone/index.html")
@@ -47,6 +52,26 @@ def upload_file(request, folder_id=None):
     else:
         form = forms.UploadFile()
     return render(request, "Capstone/upload.html", {
+        "form": form,
+        "folder": folder,
+    })
+
+@login_required
+def upload_file_in_folder(request, folder_id):
+    folder = get_object_or_404(Folder, id=folder_id, user=request.user)
+
+    if request.method == 'POST':
+        form = forms.UploadFileInFolderForm(request.POST, request.FILES)
+        if form.is_valid():
+            file = form.save(commit=False)
+            file.user = request.user
+            file.folder = folder
+            file.save()
+            return redirect("folder_files", folder_id=folder.id)
+    else:
+        form = forms.UploadFileInFolderForm()
+
+    return render(request, "Capstone/upload_file_in_folder.html", {
         "form": form,
         "folder": folder,
     })
@@ -88,8 +113,9 @@ def files(request):
 @login_required
 def folder_files(request, folder_id):
     folder = get_object_or_404(Folder, id=folder_id, user=request.user)
+    subfolders = Folder.objects.filter(user=request.user,parent=folder)    
     files = File.objects.filter(user=request.user, folder=folder)
-    return render(request, "Capstone/folder_files.html", {"folder": folder, "files": files})
+    return render(request, "Capstone/folder_files.html", {"folder": folder, "subfolders": subfolders, "files": files})
 
 @login_required
 def create_folder(request):
@@ -103,6 +129,25 @@ def create_folder(request):
     else:
         form = forms.FolderForm()
     return render(request, "Capstone/create_folder.html", {"form": form})
+
+@login_required
+def create_subfolder_in_folder(request, folder_id):
+    parent = get_object_or_404(Folder, id=folder_id, user=request.user)
+
+    if request.method == "POST":
+        form = forms.CreateSubfolderForm(request.POST)
+        if form.is_valid():
+            subfolder = form.save(commit=False)
+            subfolder.user = request.user
+            subfolder.parent = parent
+            subfolder.save()
+            return redirect("folder_files", folder_id=parent.id)
+    else:
+        form = forms.CreateSubfolderForm()
+    return render(request, "Capstone/create_subfolder_in_folder.html", {
+        "form": form,
+        "folder": parent,
+    })
 
 @login_required
 def delete_folder(request):
@@ -179,16 +224,64 @@ def move_file(request):
 
 # *************************************************************
 # *************************************************************
-# ********************** Calendario ***************************
+# ********************** Cronómetro ***************************
 # *************************************************************
 # *************************************************************
 
 @login_required
+def clock(request):
+    return render(request, "Capstone/clock.html")
+
+# *************************************************************
+# *************************************************************
+# ********************** Calendario ***************************
+# *************************************************************
+# *************************************************************
+
+@csrf_exempt
+@login_required
 def calendar(request):
-    user_events = File.objects.filter(
-        user=request.user).order_by("date")
+    if request.method == 'POST':
+        try:
+            # Leer los datos JSON enviados
+            data = json.loads(request.body)
+            print("Datos recibidos:", data)  # Depuración: Verificar los datos recibidos
+
+            # Si es "todo el día", ajustar los campos start y end
+            if data.get("allDay", False):
+                data["start"] = data.get("start")  # Solo la fecha (sin hora)
+                data["end"] = None  # No hay hora de fin
+
+            # Crear el formulario con los datos recibidos
+            form = forms.EventForm(data)
+            if form.is_valid():
+                event = form.save(commit=False)
+                event.user = request.user  # Asignar el evento al usuario actual
+                event.save()
+                return JsonResponse({"success": True})
+            else:
+                # Si el formulario no es válido, devolver los errores
+                print("Errores del formulario:", form.errors)  # Depuración: Verificar los errores
+                return JsonResponse({"success": False, "errors": form.errors}, status=400)
+        except Exception as e:
+            # Manejar cualquier excepción
+            print("Error en la vista calendar:", e)  # Depuración: Verificar la excepción
+            return JsonResponse({"success": False, "error": str(e)}, status=500)
+
+    # Si la solicitud no es POST, mostrar el calendario
+    user_events = Event.objects.filter(user=request.user)
+    events_data = [
+        {
+            'title': event.title,
+            'start': event.start.isoformat(),  # Formato ISO para FullCalendar
+            'end': event.end.isoformat() if event.end else None,
+            'allDay': event.allDay,
+        }
+        for event in user_events
+    ]
+
     return render(request, "Capstone/calendar.html", {
-        "events": user_events,
+        "events_data": json.dumps(events_data),  # Pasar los eventos como JSON
     })
 
 # *************************************************************

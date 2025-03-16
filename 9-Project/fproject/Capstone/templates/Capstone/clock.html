@@ -1,0 +1,31 @@
+{% extends "Capstone/layout.html" %}
+{% load static %}
+{% block title %}Cronómetro de Estudio{% endblock %}
+{% block body %}
+<div class="container mt-4">
+    <h1>Cronómetro de Estudio</h1>
+    <div id="timer">
+        <span id="minutes">25</span>:<span id="seconds">00</span>
+    </div>
+    <div>
+        <label for="studyTime">Minutos de estudio:</label>
+        <input type="number" id="studyTime" value="25" min="1">
+    </div>
+    <div>
+        <label for="breakTime">Minutos de descanso:</label>
+        <input type="number" id="breakTime" value="5" min="1">
+    </div>
+    <div>
+        <label for="cycles">Ciclos:</label>
+        <input type="number" id="cycles" value="4" min="1">
+    </div>
+    <button id="startTimer">Comenzar</button>
+    <button id="pauseTimer" style="display: none;">Pausar</button>
+    <button id="resetTimer" style="display: none;">Reiniciar</button>
+</div>
+<script>
+    const studyEndSoundPath = "{% static 'sounds/study_end.mp3' %}";
+    const breakEndSoundPath = "{% static 'sounds/break_end.mp3' %}";
+</script>
+<script src="{% static 'js/clock.js' %}"></script>
+{% endblock %}

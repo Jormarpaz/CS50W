@@ -80,7 +80,7 @@ a:hover {
 /*****************************************************/
 
 /* Estilo para los contenedores de archivos y carpetas */
-.file-container, .folder-container {
+.file-container, .folder-container .subfolder-container {
     display: flex; /* Usa flexbox para alinear elementos */
     align-items: center; /* Centra verticalmente los elementos */
     gap: 8px; /* Espacio entre el checkbox y el nombre */
@@ -99,13 +99,6 @@ a:hover {
     display: inline-block !important; /* Fuerza la visibilidad */
 }
 
-/* Estilo para los contenedores de archivos y carpetas */
-.file-container, .folder-container {
-    display: flex; /* Usa flexbox para alinear elementos */
-    align-items: center; /* Centra verticalmente los elementos */
-    gap: 8px; /* Espacio entre el checkbox y el nombre */
-}
-
 /* Estilo para los elementos <li> que contienen un checkbox visible */
 li:has(.delete-checkbox[style*="inline-block"]) {
     display: flex; /* Aplica flex solo cuando el checkbox está visible */
@@ -115,9 +108,34 @@ li:has(.delete-checkbox[style*="inline-block"]) {
     padding: 0;
 }
 
+
+
 .empty-message {
     list-style-type: disc !important; /* Fuerza el marcador */
     display: list-item !important; /* Asegura que sea tratado como <li> */ 
+}
+
+/*****************************************************/
+/*****************************************************/
+/*****************************************************/
+
+/*****************************************************/
+/*
+    Clock
+*/
+/*****************************************************/
+
+#timer {
+    font-size: 48px;
+    font-weight: bold;
+    margin: 20px 0;
+}
+
+#startTimer, #pauseTimer, #resetTimer {
+    margin: 10px;
+    padding: 10px 20px;
+    font-size: 16px;
+    cursor: pointer;
 }
 
 /*****************************************************/

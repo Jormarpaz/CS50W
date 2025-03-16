@@ -18,6 +18,17 @@ class User(AbstractUser):
         blank=True
     )
 
+class Event(models.Model):
+    title = models.CharField(max_length=255)
+    start = models.DateTimeField()
+    end = models.DateTimeField(null=True, blank=True)
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    allDay = models.BooleanField(default=False)
+
+    def __str__(self):
+        return self.name
+
+
 class Folder(models.Model):
     name = models.CharField(max_length=255)
     user = models.ForeignKey(User, on_delete=models.CASCADE)
