@@ -14,18 +14,28 @@ urlpatterns = [
     # Gestión de archivos
     path('files/', views.files, name='files'),
     path('files/upload/', views.upload_file, name='file-upload'),
-    path('folders/<int:folder_id>/upload-file/', views.upload_file_in_folder, name='upload_file_in_folder'),
+    path('folders/<int:folder_id>/upload-file/',
+         views.upload_file_in_folder, name='upload_file_in_folder'),
     path('delete-file/', views.delete_file, name='delete_file'),
     path('move-file/', views.move_file, name='move_file'),
 
-     # Gestión de carpetas
+    # Gestión de carpetas
     path('folders/create/', views.create_folder, name='create_folder'),
-    path('folders/<int:folder_id>/create-subfolder/', views.create_subfolder_in_folder, name='create_subfolder_in_folder'),
+    path('folders/<int:folder_id>/create-subfolder/',
+         views.create_subfolder_in_folder, name='create_subfolder_in_folder'),
     path('folders/<int:folder_id>/', views.folder_files, name='folder_files'),
     path('delete-folder/', views.delete_folder, name='delete_folder'),
 
     # Otras funciones
     path('clock/', views.clock, name='clock'),
+
     path('calendar/', views.calendar, name='calendar'),
+    path('calendar/event/<int:event_id>/delete/',
+         views.delete_event, name='delete_event'),
+    path('calendar/event/<int:event_id>/edit/',
+         views.edit_event, name='edit_event'),
+
+
     path('contact/', views.contact, name='contact'),
+    path('send_message/', views.send_message, name='send_message'),
 ]

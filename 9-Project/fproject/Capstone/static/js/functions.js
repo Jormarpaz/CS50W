@@ -205,7 +205,7 @@ function confirmDelete() {
 }
 
 function cancelDelete() {
-    location.reload();
+  location.reload();
 }
 
 // Llamar a checkIfEmpty() después de crear una subcarpeta

@@ -6,33 +6,38 @@ from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_POST
 from django.shortcuts import render, redirect, get_object_or_404
 from django.db import IntegrityError
-from django.contrib import messages
 from django.urls import reverse
 from django.utils import timezone
+from django.core.mail import send_mail
+from django.conf import settings
 import os
 
 from .models import User, File, Folder, Event
 from . import forms
 
 # Create your views here.
+
+
 def index(request):
     if request.user.is_authenticated:
         user_files = File.objects.filter(
             user=request.user).order_by("-date")
         now = timezone.now()
-        upcoming_events = Event.objects.filter(user=request.user, start__gte=now).order_by('start')[:4]
+        upcoming_events = Event.objects.filter(
+            user=request.user, start__gte=now).order_by('start')[:4]
         return render(request, "Capstone/index.html", {
             "user_files": user_files,
             "upcoming_events": upcoming_events,
         })
     else:
         return render(request, "Capstone/index.html")
-    
+
 # *************************************************************
 # *************************************************************
 # *********************** Archivos ****************************
 # *************************************************************
 # *************************************************************
+
 
 @login_required
 def upload_file(request, folder_id=None):
@@ -56,6 +61,7 @@ def upload_file(request, folder_id=None):
         "folder": folder,
     })
 
+
 @login_required
 def upload_file_in_folder(request, folder_id):
     folder = get_object_or_404(Folder, id=folder_id, user=request.user)
@@ -76,6 +82,7 @@ def upload_file_in_folder(request, folder_id):
         "folder": folder,
     })
 
+
 @login_required
 @require_POST
 def delete_file(request):
@@ -95,14 +102,16 @@ def delete_file(request):
         return JsonResponse({'success': False, 'error': 'Archivo no encontrado'}, status=404)
     except Exception as e:
         return JsonResponse({'success': False, 'error': str(e)}, status=500)
-    
+
+
 @login_required
 def files(request):
     folders = Folder.objects.filter(user=request.user, parent__isnull=True)
     subfolders = Folder.objects.filter(user=request.user, parent__isnull=False)
     user_files = File.objects.filter(
         user=request.user, folder__isnull=True).order_by("-date")
-    folder_files = {folder.id: File.objects.filter(folder=folder) for folder in Folder.objects.filter(user=request.user)}
+    folder_files = {folder.id: File.objects.filter(
+        folder=folder) for folder in Folder.objects.filter(user=request.user)}
     return render(request, "Capstone/files.html", {
         "folders": folders,
         "user_files": user_files,
@@ -110,12 +119,14 @@ def files(request):
         "subfolders": subfolders
     })
 
+
 @login_required
 def folder_files(request, folder_id):
     folder = get_object_or_404(Folder, id=folder_id, user=request.user)
-    subfolders = Folder.objects.filter(user=request.user,parent=folder)    
+    subfolders = Folder.objects.filter(user=request.user, parent=folder)
     files = File.objects.filter(user=request.user, folder=folder)
     return render(request, "Capstone/folder_files.html", {"folder": folder, "subfolders": subfolders, "files": files})
+
 
 @login_required
 def create_folder(request):
@@ -129,6 +140,7 @@ def create_folder(request):
     else:
         form = forms.FolderForm()
     return render(request, "Capstone/create_folder.html", {"form": form})
+
 
 @login_required
 def create_subfolder_in_folder(request, folder_id):
@@ -149,6 +161,7 @@ def create_subfolder_in_folder(request, folder_id):
         "folder": parent,
     })
 
+
 @login_required
 def delete_folder(request):
     if request.method == "POST":
@@ -160,7 +173,7 @@ def delete_folder(request):
             if not folder_id:
                 return JsonResponse({"success": False, "error": "ID de carpeta no proporcionado"}, status=400)
 
-            folder = Folder.objects.get(id=folder_id)    
+            folder = Folder.objects.get(id=folder_id)
 
             files = File.objects.filter(folder=folder)
             if files.exists():
@@ -169,7 +182,7 @@ def delete_folder(request):
                     if os.path.exists(file_path):
                         os.remove(file_path)
                     file.delete()
-            
+
             def delete_subfolders(folder):
                 subfolders = Folder.objects.filter(parent=folder)
                 for subfolder in subfolders:
@@ -193,6 +206,7 @@ def delete_folder(request):
 # *********************** Arrastre ****************************
 # *************************************************************
 # *************************************************************
+
 
 @login_required
 def move_file(request):
@@ -228,6 +242,7 @@ def move_file(request):
 # *************************************************************
 # *************************************************************
 
+
 @login_required
 def clock(request):
     return render(request, "Capstone/clock.html")
@@ -238,6 +253,7 @@ def clock(request):
 # *************************************************************
 # *************************************************************
 
+
 @csrf_exempt
 @login_required
 def calendar(request):
@@ -245,7 +261,8 @@ def calendar(request):
         try:
             # Leer los datos JSON enviados
             data = json.loads(request.body)
-            print("Datos recibidos:", data)  # Depuración: Verificar los datos recibidos
+            # Depuración: Verificar los datos recibidos
+            print("Datos recibidos:", data)
 
             # Si es "todo el día", ajustar los campos start y end
             if data.get("allDay", False):
@@ -261,17 +278,20 @@ def calendar(request):
                 return JsonResponse({"success": True})
             else:
                 # Si el formulario no es válido, devolver los errores
-                print("Errores del formulario:", form.errors)  # Depuración: Verificar los errores
+                # Depuración: Verificar los errores
+                print("Errores del formulario:", form.errors)
                 return JsonResponse({"success": False, "errors": form.errors}, status=400)
         except Exception as e:
             # Manejar cualquier excepción
-            print("Error en la vista calendar:", e)  # Depuración: Verificar la excepción
+            # Depuración: Verificar la excepción
+            print("Error en la vista calendar:", e)
             return JsonResponse({"success": False, "error": str(e)}, status=500)
 
     # Si la solicitud no es POST, mostrar el calendario
-    user_events = Event.objects.filter(user=request.user)
+    user_events = Event.objects.filter(user=request.user).order_by('start')
     events_data = [
         {
+            'id': event.id,
             'title': event.title,
             'start': event.start.isoformat(),  # Formato ISO para FullCalendar
             'end': event.end.isoformat() if event.end else None,
@@ -282,7 +302,46 @@ def calendar(request):
 
     return render(request, "Capstone/calendar.html", {
         "events_data": json.dumps(events_data),  # Pasar los eventos como JSON
+        "events": user_events,
     })
+
+
+@csrf_exempt
+@login_required
+def delete_event(request, event_id):
+    if request.method == 'DELETE':
+        try:
+            event = Event.objects.get(id=event_id, user=request.user)
+            event.delete()
+            return JsonResponse({"success": True})
+        except Event.DoesNotExist:
+            return JsonResponse({"success": False, "error": "Evento no encontrado"}, status=404)
+        except Exception as e:
+            return JsonResponse({"success": False, "error": str(e)}, status=500)
+    return JsonResponse({"success": False, "error": "Método no permitido"}, status=405)
+
+
+@csrf_exempt
+@login_required
+def edit_event(request, event_id):
+    if request.method == 'PUT':
+        try:
+            data = json.loads(request.body)
+            event = Event.objects.get(id=event_id, user=request.user)
+
+            event.title = data.get('title', event.title)
+            event.start = data.get('start', event.start)
+            event.end = data.get('end', event.end)
+            event.allDay = data.get('allDay', event.allDay)
+            event.save()
+
+            return JsonResponse({"success": True})
+        except Event.DoesNotExist:
+            return JsonResponse({"success": False, "error": "Evento no encontrado"}, status=404)
+        except Exception as e:
+            return JsonResponse({"success": False, "error": str(e)}, status=500)
+    return JsonResponse({"success": False, "error": "Método no permitido"}, status=405)
+
 
 # *************************************************************
 # *************************************************************
@@ -290,18 +349,44 @@ def calendar(request):
 # *************************************************************
 # *************************************************************
 
+@login_required
 def contact(request):
-    if request.method == "POST":
-        name = request.POST["name"]
-        email = request.POST["email"]
-        message = request.POST["message"]
-
-        # Aquí puedes agregar la lógica para enviar el mensaje por correo electrónico
-        # o guardarlo en la base de datos, según tus necesidades.
-
-        messages.success(request, "Your message has been sent successfully!")
-        return redirect("contact")
     return render(request, "Capstone/contact.html")
+
+
+@csrf_exempt
+@login_required
+def send_message(request):
+    if request.method == 'POST':
+        try:
+            # Obtener los datos del formulario
+            name = request.POST.get('name')
+            email = request.POST.get('email')
+            subject = request.POST.get('subject')
+            message = request.POST.get('message')
+
+            # Validar que todos los campos estén presentes
+            if not all([name, email, subject, message]):
+                return JsonResponse({'success': False, 'error': 'Todos los campos son obligatorios.'}, status=400)
+
+            # Enviar el correo electrónico
+            send_mail(
+                f'Mensaje de contacto: {subject}',
+                f'Nombre: {name}\nCorreo: {email}\nMensaje: {message}',
+                settings.EMAIL_HOST_USER,  # Cambia esto por tu correo
+                [settings.EMAIL_HOST_USER],  # Cambia esto por tu correo
+                fail_silently=False,
+            )
+
+            # Devolver una respuesta de éxito
+            return JsonResponse({'success': True})
+
+        except Exception as e:
+            # Manejar cualquier excepción que ocurra durante el proceso
+            return JsonResponse({'success': False, 'error': str(e)}, status=500)
+
+    # Si la solicitud no es POST, devolver un error
+    return JsonResponse({'success': False, 'error': 'Método no permitido.'}, status=405)
 
 
 ############################################

@@ -5,11 +5,55 @@
   <div>
     <div id="calendar"></div>
   </div>
-  
+
+  <!--//////////////////////////////
+  /* Tabla de eventos creados */
+  //////////////////////////////-->
+  <div class="container mt-4">
+    <h2>Lista de Eventos</h2>
+    <table class="table table-striped">
+      <thead>
+        <tr>
+          <th>Título</th>
+          <th>Fecha de Inicio</th>
+          <th>Fecha de Fin</th>
+          <th>Acciones</th>
+        </tr>
+      </thead>
+      <tbody id="event-list">
+        {% for event in events %}
+        <tr id="event-row-{{ event.id }}">
+          <td>{{ event.title }}</td>
+          <td>{% if event.allDay %}
+            {{ event.start|date:"Y-m-d" }}
+            <br />
+            Dura todo el dia
+            {% else %}
+            {{ event.start|date:"Y-m-d H:i" }}
+            {% endif %}
+          </td>
+          <td>
+            {% if event.allDay %}
+            -
+            {% else %}
+            {{ event.end|date:"Y-m-d H:i" }}
+            {% endif %}
+          </td>
+          <td>
+            <button onclick="editEvent('{{ event.id }}')" class="btn btn-warning btn-sm edit-event"
+              data-event-id="{{ event.id }}">Editar</button>
+            <button onclick="deleteEvent('{{ event.id }}')" class="btn btn-danger btn-sm delete-event"
+              data-event-id="{{ event.id }}">Eliminar</button>
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+
+
   <!-- Formulario de añadir evento oculto -->
-  <form
-    id="event-form"
-    style="
+  <form id="event-form" style="
       display: none;
       position: fixed;
       top: 50%;
@@ -21,17 +65,11 @@
       border-radius: 5px;
       box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
       z-index: 1000;
-    "
-  >
+    ">
     <div class="form-group">
       <label for="event-title">Título del evento:</label>
-      <input
-        type="text"
-        id="event-title"
-        class="form-control input-no-outline"
-        placeholder="Introduce el título del evento"
-        autocomplete="off"
-      />
+      <input type="text" id="event-title" class="form-control input-no-outline"
+        placeholder="Introduce el título del evento" autocomplete="off" />
     </div>
     <div class="form-group">
       <label for="event-start">Hora de inicio:</label>
@@ -43,93 +81,289 @@
     </div>
     <div class="form-group">
       <label for="event-all-day">Todo el día:</label>
-      <input
-        type="checkbox"
-        id="event-all-day"
-        class="form-control input-no-outline"
-        onchange="localStorage.setItem('eventAllDay', this.checked)"
-      />
+      <input type="checkbox" id="event-all-day" class="form-control input-no-outline"
+        onchange="localStorage.setItem('eventAllDay', this.checked)" />
     </div>
     <button type="submit" class="btn btn-primary">Añadir evento</button>
-    <button
-      type="button"
-      class="btn btn-secondary"
-      onclick="document.getElementById('event-form').style.display='none'"
-    >
+    <button type="button" class="btn btn-secondary"
+      onclick="document.getElementById('event-form').style.display='none'">
       Cancelar
     </button>
   </form>
 </div>
-<!--<script src="{% static 'js/calendar.js' %}"></script>-->
+
+
 <script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.15/index.global.min.js"></script>
+
 <script>
+  var selectedDate;
+
   document.addEventListener("DOMContentLoaded", function () {
     var calendarEl = document.getElementById("calendar");
+
     var calendar = new FullCalendar.Calendar(calendarEl, {
-        headerToolbar: {
-            left: "prev,next today",
-            center: "title",
-            right: "dayGridMonth,timeGridWeek,timeGridDay",
-        },
-        initialView: "dayGridMonth",
-        editable: true,
-        selectable: true,
-        unselectAuto: true,
-        events: JSON.parse('{{ events_data|safe }}'),  // Usar los eventos desde la base de datos
-        dateClick: function (info) {
-            // Mostrar el formulario para añadir un evento
-            var form = document.getElementById("event-form");
-            form.style.display = "block";
+      headerToolbar: {
+        left: "prev,next today",
+        center: "title",
+        right: "dayGridMonth,timeGridWeek,timeGridDay",
+      },
+      initialView: "dayGridMonth",
+      editable: true,
+      selectable: true,
+      unselectAuto: true,
+      timeZone: "local",
+      events: JSON.parse('{{ events_data|safe }}'),
 
-            // Prellenar la fecha seleccionada
-            var selectedDate = info.dateStr;  // Fecha en formato YYYY-MM-DD
-            document.getElementById("event-start").value = selectedDate + "T00:00";
-            document.getElementById("event-end").value = selectedDate + "T23:59";
+      eventClick: function (info) {
+        var event = info.event;
 
-            // Manejar el envío del formulario
-            form.onsubmit = function (event) {
-                event.preventDefault();
-                var title = document.getElementById("event-title").value;
-                var start = document.getElementById("event-start").value;
-                var end = document.getElementById("event-end").value;
-                var allDay = document.getElementById("event-all-day").checked;
+        // Convertir las horas a la hora local del navegador
+        var startTime = event.start ? new Date(event.start).toLocaleString('es-ES', { year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit' }) : '';
+        var endTime = event.end ? new Date(event.end).toLocaleString('es-ES', { year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit' }) : '';
 
-                // Si es "todo el día", no necesitamos start y end
-                if (allDay) {
-                    start = selectedDate;  // Solo la fecha (sin hora)
-                    end = null;          // No hay hora de fin
+        var eventsContainer = document.createElement("div");
+        eventsContainer.id = "events-container";
+        eventsContainer.innerHTML = `
+          <h3>Editar evento: ${event.title}</h3>
+          <p>Fecha de inicio: ${startTime}</p>
+          <p>Fecha de fin: ${endTime}</p>
+          <p>¿Todo el día? ${event.allDay ? "Sí" : "No"}</p>
+          <button class="btn btn-primary" onclick="editEvent('${event.id}')">Editar</button>
+          <button class="btn btn-danger" onclick="deleteEvent('${event.id}')">Eliminar</button>
+          <button class="btn btn-secondary" onclick="document.body.removeChild(this.parentElement)">Cerrar</button>
+        `;
+        eventsContainer.style.position = "fixed";
+        eventsContainer.style.top = "50%";
+        eventsContainer.style.left = "50%";
+        eventsContainer.style.transform = "translate(-50%, -50%)";
+        eventsContainer.style.backgroundColor = "white";
+        eventsContainer.style.padding = "20px";
+        eventsContainer.style.border = "1px solid #ccc";
+        eventsContainer.style.borderRadius = "5px";
+        eventsContainer.style.boxShadow = "0 4px 8px rgba(0, 0, 0, 0.1)";
+        eventsContainer.style.zIndex = "1000";
+
+        document.body.appendChild(eventsContainer);
+      },
+
+      dateClick: function (info) {
+        selectedDate = info.dateStr; // Asignar el valor a selectedDate
+        var form = document.getElementById("event-form");
+        form.style.display = "block";
+        document.getElementById("event-start").value = selectedDate + "T00:00";
+        document.getElementById("event-end").value = selectedDate + "T23:59";
+
+        form.onsubmit = function (event) {
+          event.preventDefault();
+          var title = document.getElementById("event-title").value;
+          var start = document.getElementById("event-start").value;
+          var end = document.getElementById("event-end").value;
+          var allDay = document.getElementById("event-all-day").checked;
+
+          if (allDay) {
+            start = selectedDate; // Usar selectedDate
+            end = null;
+          } else {
+            // Asegúrate de que start y end tengan valores válidos
+            if (start) {
+              start = new Date(selectedDate + "T" + start).toISOString();
+            } else {
+              alert("Por favor, introduce una hora de inicio válida.");
+              return;
+            }
+
+            if (end) {
+              end = new Date(selectedDate + "T" + end).toISOString();
+            } else {
+              alert("Por favor, introduce una hora de finalización válida.");
+              return;
+            }
+          }
+
+          if (title) {
+            fetch("{% url 'calendar' %}", {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json",
+                "X-CSRFToken": "{{ csrf_token }}",
+              },
+              body: JSON.stringify({
+                title: title,
+                start: start,
+                end: end,
+                allDay: allDay,
+              }),
+            })
+              .then(response => response.json())
+              .then(data => {
+                if (data.success) {
+                  calendar.refetchEvents();
+                  location.reload();
+                  form.style.display = "none";
+                } else {
+                  alert("Error al guardar el evento: " + JSON.stringify(data.errors));
                 }
-
-                if (title) {
-                    // Enviar los datos al servidor usando Fetch API
-                    fetch("{% url 'calendar' %}", {
-                        method: "POST",
-                        headers: {
-                            "Content-Type": "application/json",
-                            "X-CSRFToken": "{{ csrf_token }}",
-                        },
-                        body: JSON.stringify({
-                            title: title,
-                            start: start,  // Formato: "YYYY-MM-DD" (si es allDay) o "YYYY-MM-DDTHH:MM"
-                            end: end,      // Formato: "YYYY-MM-DD" (si es allDay) o "YYYY-MM-DDTHH:MM"
-                            allDay: allDay,
-                        }),
-                    })
-                    .then(response => response.json())
-                    .then(data => {
-                        if (data.success) {
-                            calendar.refetchEvents();  // Recargar los eventos en el calendario
-                            location.reload();
-                            form.style.display = "none";
-                        } else {
-                            alert("Error al guardar el evento: " + JSON.stringify(data.errors));
-                        }
-                    });
-                }
-            };
-        },
+              });
+          } else {
+            alert("Por favor, introduce un título para el evento.");
+          }
+        };
+      }
     });
     calendar.render();
-});
+
+    window.editEvent = function (eventId) {
+      // Obtener el evento del calendario
+      var event = calendar.getEventById(eventId);
+
+      if (event) {
+        // Convertir las horas a la hora local del navegador
+        var startTime = event.start ? new Date(event.start).toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit' }) : '';
+        var endTime = event.end ? new Date(event.end).toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit' }) : '';
+
+        // Crear un contenedor para el formulario de edición
+        var editFormContainer = document.createElement("div");
+        editFormContainer.id = "edit-event-form-container";
+        editFormContainer.innerHTML = `
+      <h3>Editar Evento: ${event.title}</h3>
+      <form id="edit-event-form">
+        <div class="form-group">
+          <label for="edit-event-title">Título del evento:</label>
+          <input type="text" id="edit-event-title" class="form-control" value="${event.title}" />
+        </div>
+        <div class="form-group">
+          <label for="edit-event-start">Hora de inicio:</label>
+          <input type="time" id="edit-event-start" class="form-control" value="${startTime}" />
+        </div>
+        <div class="form-group">
+          <label for="edit-event-end">Hora de finalización:</label>
+          <input type="time" id="edit-event-end" class="form-control" value="${endTime}" />
+        </div>
+        <div class="form-group">
+          <label for="edit-event-all-day">Todo el día:</label>
+          <input type="checkbox" id="edit-event-all-day" class="form-control" ${event.allDay ? 'checked' : ''} />
+        </div>
+        <button type="submit" class="btn btn-primary">Guardar cambios</button>
+        <button type="button" class="btn btn-secondary" onclick="document.body.removeChild(this.parentElement.parentElement)">Cancelar</button>
+      </form>
+    `;
+
+        // Estilos para el contenedor del formulario
+        editFormContainer.style.position = "fixed";
+        editFormContainer.style.top = "50%";
+        editFormContainer.style.left = "50%";
+        editFormContainer.style.transform = "translate(-50%, -50%)";
+        editFormContainer.style.backgroundColor = "white";
+        editFormContainer.style.padding = "20px";
+        editFormContainer.style.border = "1px solid #ccc";
+        editFormContainer.style.borderRadius = "5px";
+        editFormContainer.style.boxShadow = "0 4px 8px rgba(0, 0, 0, 0.1)";
+        editFormContainer.style.zIndex = "1000";
+
+        // Añadir el formulario al cuerpo del documento
+        document.body.appendChild(editFormContainer);
+
+        // Manejar el envío del formulario
+        document.getElementById("edit-event-form").onsubmit = function (e) {
+          e.preventDefault();
+
+          // Obtener los valores del formulario
+          var title = document.getElementById("edit-event-title").value;
+          var startTime = document.getElementById("edit-event-start").value;
+          var endTime = document.getElementById("edit-event-end").value;
+          var allDay = document.getElementById("edit-event-all-day").checked;
+
+          // Validar que se haya ingresado una hora de inicio y fin
+          if (!startTime || !endTime) {
+            alert("Por favor, introduce una hora de inicio y fin válidas.");
+            return;
+          }
+
+          // Crear las nuevas fechas con la misma fecha pero con la hora modificada
+          var newStart = new Date(event.start);
+          var newEnd = new Date(event.end || event.start); // Si no hay fecha de fin, usamos la de inicio
+
+          // Actualizar solo la hora
+          newStart.setHours(startTime.split(":")[0], startTime.split(":")[1]);
+          newEnd.setHours(endTime.split(":")[0], endTime.split(":")[1]);
+
+          // Si es "Todo el día", ajustar las fechas
+          if (allDay) {
+            newStart.setHours(0, 0, 0, 0);
+            newEnd.setHours(23, 59, 59, 999);
+          }
+
+          // Enviar los cambios al servidor
+          fetch(`/calendar/event/${eventId}/edit/`, {
+            method: "PUT",
+            headers: {
+              "Content-Type": "application/json",
+              "X-CSRFToken": "{{ csrf_token }}", // Asegúrate de incluir el token CSRF
+            },
+            body: JSON.stringify({
+              title: title,
+              start: newStart.toISOString(),
+              end: newEnd.toISOString(),
+              allDay: allDay,
+            }),
+          })
+            .then((response) => response.json())
+            .then((data) => {
+              if (data.success) {
+                // Recargar la página para reflejar los cambios
+                //location.reload();
+                // Actualizar el evento en el calendario
+                event.setProp("title", title);
+                event.setStart(newStart);
+                event.setEnd(newEnd);
+                event.setAllDay(allDay);
+
+                // Actualizar la lista de eventos en la tabla
+                var eventRow = document.getElementById(`event-row-${eventId}`);
+                if (eventRow) {
+                  eventRow.querySelector("td:nth-child(1)").textContent = title;
+                  eventRow.querySelector("td:nth-child(2)").textContent = allDay ? "Dura todo el día" : newStart.toLocaleString();
+                  eventRow.querySelector("td:nth-child(3)").textContent = allDay ? "-" : newEnd.toLocaleString();
+                }
+
+                // Cerrar el formulario después de guardar
+                document.body.removeChild(editFormContainer);
+              } else {
+                alert("Error al guardar los cambios: " + JSON.stringify(data.errors));
+              }
+            })
+            .catch((error) => {
+              console.error("Error:", error);
+              alert("Hubo un error al guardar los cambios.");
+            });
+
+          // Cerrar el formulario después de guardar
+          //document.body.removeChild(editFormContainer);
+        };
+      }
+    };
+
+    window.deleteEvent = function (eventId) {
+      if (confirm("¿Estás seguro de que quieres eliminar este evento?")) {
+        fetch(`/calendar/event/${eventId}/delete/`, {
+          method: "DELETE",
+          headers: {
+            "Content-Type": "application/json",
+            "X-CSRFToken": "{{ csrf_token }}",
+          },
+        })
+          .then(response => response.json())
+          .then(data => {
+            if (data.success) {
+              calendar.refetchEvents();
+              location.reload();
+            } else {
+              alert("Error al eliminar el evento: " + JSON.stringify(data.errors));
+            }
+          });
+      }
+    };
+  });
 </script>
+
 {% endblock %}

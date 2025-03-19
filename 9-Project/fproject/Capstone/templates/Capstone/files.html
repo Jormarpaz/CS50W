@@ -6,66 +6,17 @@
 <div class="container mt-4">
   <h1>Mis Archivos</h1>
 
+  <!-- Carpetas -->
   <h2>Carpetas</h2>
   <ul id="folder-container">
-    <!-- Carpetas -->
     {% for folder in folders %}
-    <li class="folder" ondrop="drop(event)" ondragover="allowDrop(event)" data-folder-id="{{ folder.id }}">
+    <li class="folder" data-folder-id="{{ folder.id }}">
       <div class="folder-container">
         <input type="checkbox" class="delete-checkbox" value="{{ folder.id }}" style="display: none"
           data-type="folder" />
         <a href="{% url 'folder_files' folder.id %}">{{ folder.name }}</a>
+
       </div>
-      <ul>
-        <!-- Subcarpetas -->
-        {% for subfolder in subfolders %}
-        {% if subfolder.parent_id == folder.id %}
-        <li class="folder" ondrop="drop(event)" ondragover="allowDrop(event)" data-folder-id="{{ subfolder.id }}">
-          <div class="folder-container">
-            <input type="checkbox" class="delete-checkbox" value="{{ subfolder.id }}" style="display: none"
-              data-type="folder" />
-            <a href="{% url 'folder_files' folder.id %}">{{ folder.name }}</a>
-          </div>
-          <ul>
-            {% with folder_files|get_item:subfolder.id as subfolder_files %}
-            {% if subfolder_files %}
-            <!-- Archivos en la subcarpeta -->
-            {% for file in subfolder_files %}
-            <li class="file" draggable="true" ondragstart="drag(event)" data-file-id="{{ file.id }}">
-              <div class="file-container">
-                <input type="checkbox" class="delete-checkbox" value="{{ file.id }}" style="display: none"
-                  data-type="file" />
-                <a href="{{ file.file.url }}">{{ file.name }}</a> - {{ file.date }}
-              </div>
-              {% if file.tags %}
-              <span class="badge badge-info">{{ file.tags }}</span>
-              {% endif %}
-            </li>
-            {% endfor %}
-            {% else %}
-            <li class="empty-message">(Vacía)</li>
-            {% endif %}
-            {% endwith %}
-          </ul>
-        </li>
-        {% endif %}
-        {% endfor %}
-        <!-- Archivos en la carpeta -->
-        {% for file in folder_files|get_item:folder.id %}
-        <li class="file" draggable="true" ondragstart="drag(event)" data-file-id="{{ file.id }}">
-          <div class="file-container">
-            <input type="checkbox" class="delete-checkbox" value="{{ file.id }}" style="display: none"
-              data-type="file" />
-            <a href="{{ file.file.url }}">{{ file.name }}</a> - {{ file.date }}
-          </div>
-          {% if file.tags %}
-          <span class="badge badge-info">{{ file.tags }}</span>
-          {% endif %}
-        </li>
-        {% empty %}
-        <li class="empty-message">(Vacía)</li>
-        {% endfor %}
-      </ul>
     </li>
     {% empty %}
     <li>
@@ -73,11 +24,12 @@
     </li>
     {% endfor %}
   </ul>
-  {% csrf_token %}
+
+  <!-- Archivos en la raíz -->
   <h2>Archivos en la raíz</h2>
-  <ul id="root-folder" ondrop="drop(event)" ondragover="allowDrop(event)">
+  <ul id="root-folder">
     {% for file in user_files %}
-    <li class="file" draggable="true" ondragstart="drag(event)" data-file-id="{{ file.id }}">
+    <li class="file" data-file-id="{{ file.id }}">
       <div class="file-container">
         <input type="checkbox" class="delete-checkbox" value="{{ file.id }}" style="display: none" data-type="file" />
         <a href="{{ file.file.url }}">{{ file.name }}</a> - {{ file.date }}
@@ -87,9 +39,11 @@
       {% endif %}
     </li>
     {% empty %}
-    <li class="empty-message">No hay archivos en la raiz</li>
+    <li class="empty-message">No hay archivos en la raíz</li>
     {% endfor %}
   </ul>
+
+  <!-- Botones de acciones -->
   <div class="d-flex flex-column">
     <div class="d-flex justify-content-start mt-2">
       <a class="btn btn-secondary" href="{% url 'file-upload' %}">Subir Archivo</a>
@@ -105,6 +59,8 @@
     </div>
   </div>
 </div>
+
+<!-- Scripts -->
 <script>
   const FILE_UPLOAD_URL = "{% url 'file-upload' %}";
   const CREATE_FOLDER_URL = "{% url 'create_folder' %}";

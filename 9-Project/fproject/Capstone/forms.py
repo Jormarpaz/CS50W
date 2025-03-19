@@ -1,25 +1,30 @@
 from django import forms
 from .models import File, Folder, Event
 
+
 class UploadFile(forms.ModelForm):
     class Meta:
         model = File
         fields = ["name", "file", "folder", "tags"]
+
 
 class FolderForm(forms.ModelForm):
     class Meta:
         model = Folder
         fields = ["name", "parent"]
 
+
 class CreateSubfolderForm(forms.ModelForm):
     class Meta:
         model = Folder
         fields = ['name']
 
+
 class UploadFileInFolderForm(forms.ModelForm):
     class Meta:
         model = File
         fields = ['name', 'file']
+
 
 class EventForm(forms.ModelForm):
     class Meta:
@@ -29,7 +34,7 @@ class EventForm(forms.ModelForm):
             'start': forms.DateTimeInput(attrs={'type': 'datetime-local'}),
             'end': forms.DateTimeInput(attrs={'type': 'datetime-local'})
         }
-        
+
     def clean(self):
         cleaned_data = super().clean()
         allDay = cleaned_data.get("allDay")

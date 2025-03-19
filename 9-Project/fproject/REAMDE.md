@@ -1,108 +1,121 @@
-# Student Resource Manager
+# Student Organization Platform
 
-## Descripción
+## Distinctiveness and Complexity
 
-Student Resource Manager es una plataforma web diseñada para ayudar a los estudiantes a organizar, gestionar y acceder a sus recursos académicos de manera eficiente. Los usuarios pueden subir archivos, categorizarlos, buscar contenido específico, gestionar tareas mediante un calendario interactivo y obtener resúmenes automáticos y tests de repaso basados en sus archivos.
+This project, the **Student Organization Platform**, is distinct from the other projects in the CS50 course due to its comprehensive approach to solving common problems faced by students. While other projects in the course typically focus on a single functionality (e.g., a social network, an e-commerce site, or a search engine), this platform combines **multiple functionalities** into one cohesive application, making it a versatile tool for students. Specifically, it integrates:
 
-## Características Principales
+1. **File and Folder Management**: Students can upload, organize, and delete files and folders, similar to a cloud storage system but tailored for academic use.
+2. **Study Timer**: A Pomodoro-style timer helps students manage their study and break times effectively.
+3. **Event Calendar**: A dynamic calendar allows students to schedule and manage their academic and personal events.
+4. **Contact Form**: A fully functional contact form enables users to send messages, which are delivered via email.
 
-- **Autenticación de Usuarios**: Registro y inicio de sesión seguro.
-- **Carga y Gestión de Archivos**: Soporte para múltiples tipos de archivos con organización por etiquetas.
-- **Motor de Búsqueda Avanzado**: Búsqueda por nombre, etiquetas y contenido.
-- **Calendario Interactivo**: Gestión de tareas y eventos académicos.
-- **Resumenes Automáticos**: Generación de resúmenes de documentos.
-- **Tests de Repaso**: Cuestionarios automáticos basados en el contenido de los archivos.
-- **Previsualización de Archivos**: Visualización directa en el navegador.
+The **complexity** of this project lies in the integration of these diverse functionalities into a single platform. Each feature requires a different set of skills and technologies:
 
-## Distinción y Complejidad
+- **Backend Logic**: Django handles user authentication, file storage, event management, and email sending.
+- **Frontend Interactivity**: JavaScript and Bootstrap are used to create a responsive and dynamic user interface, including the interactive study timer and calendar.
+- **Database Management**: SQLite (by default in Django) stores user data, files, folders, and events, requiring careful design of models and relationships.
+- **Third-Party Libraries**: The project uses external libraries like FullCalendar for the calendar functionality, demonstrating the ability to integrate and customize third-party tools.
 
-Este proyecto se distingue de los demás proyectos del curso por su enfoque integral en la organización académica, combinando múltiples funcionalidades avanzadas como búsqueda por contenido, generación de resúmenes automáticos y tests de repaso. La integración de tecnologías como FullCalendar.js para la gestión de eventos y librerías de procesamiento de lenguaje natural para los resúmenes y tests agrega una capa de complejidad significativa, asegurando que el proyecto sea más robusto y útil que los ejemplos proporcionados en el curso.
+Moreover, the project goes beyond the basic CRUD (Create, Read, Update, Delete) operations seen in many other projects. For example:
+- The **file management system** supports nested folders and recursive deletion, which adds complexity to the backend logic.
+- The **study timer** includes sound notifications and customizable study/break cycles, requiring precise timing and event handling in JavaScript.
+- The **calendar** allows for dynamic event creation, editing, and deletion, with real-time updates to the UI.
 
-## Estructura del Proyecto
+In summary, this project is **distinct** because it addresses multiple needs of students in one platform, and it is **complex** due to the integration of various technologies and the advanced features implemented in each functionality.
 
-- **student_resource_manager/**: Directorio principal del proyecto Django.
-  - **settings.py**: Configuraciones del proyecto.
-  - **urls.py**: Rutas principales del proyecto.
-- **resources/**: Aplicación principal para la gestión de recursos.
-  - **models.py**: Definición de los modelos `File` y `Event`.
-  - **views.py**: Vistas para manejar la lógica de carga, búsqueda y gestión de archivos.
-  - **templates/**: Plantillas HTML para las diferentes páginas.
-  - **static/**: Archivos estáticos como CSS y JavaScript.
-- **templates/**: Plantillas globales del proyecto.
-- **requirements.txt**: Lista de dependencias de Python.
+---
 
-## Instalación y Uso
+## Project Structure
 
-### Prerrequisitos
+### Files and Their Contents
 
-- Python 3.8+
-- pip
-- PostgreSQL (opcional, SQLite por defecto)
+- **`README.md`**: This file, providing an overview of the project, its distinctiveness, complexity, and instructions for running it.
+- **`requirements.txt`**: Lists all Python packages required to run the application.
+- **`manage.py`**: The Django command-line utility for administrative tasks.
+- **`Capstone/`**: The main Django application directory.
+  - **`settings.py`**: Configuration settings for the Django project, including database, static files, and email settings.
+  - **`urls.py`**: URL routing for the entire project.
+  - **`wsgi.py`**: WSGI configuration for deployment.
+  - **`asgi.py`**: ASGI configuration for asynchronous deployment.
+- **`Capstone/templates/`**: Contains HTML templates for the application.
+  - **`layout.html`**: The base template that other templates extend.
+  - **`index.html`**: The homepage, displaying recent files and upcoming events.
+  - **`files.html`**: The file management interface.
+  - **`folder_files.html`**: The interface for viewing files within a specific folder.
+  - **`clock.html`**: The study timer interface.
+  - **`calendar.html`**: The event calendar interface.
+  - **`contact.html`**: The contact form and FAQ section.
+  - **`login.html`**, **`register.html`**: Authentication pages.
+- **`Capstone/static/`**: Contains static files such as CSS, JavaScript, and sounds.
+  - **`styles.css`**: Custom CSS for styling the application.
+  - **`clock.js`**: JavaScript logic for the study timer.
+  - **`functions.js`**: JavaScript functions for file and folder management.
+  - **`sounds/`**: Audio files for timer notifications.
+- **`Capstone/models.py`**: Defines the database models for users, files, folders, and events.
+- **`Capstone/views.py`**: Contains the view functions for handling requests and rendering templates.
+- **`Capstone/forms.py`**: Defines forms for file uploads, event creation, and user registration.
+- **`Capstone/urls.py`**: URL routing for the Capstone application.
 
-### Pasos de Instalación
+---
 
-1. **Clonar el Repositorio**:
+## How to Run the Application
 
-    ```bash
-    git clone https://github.com/tu_usuario/student_resource_manager.git
-    cd student_resource_manager
-    ```
+### Prerequisites
+1. **Python**: Ensure Python 3.x is installed on your system.
+2. **Pip**: Ensure Pip is installed to manage Python packages.
 
-2. **Crear un Entorno Virtual**:
+### Installation Steps
+1. **Clone the repository**:
+   ```bash
+   git clone https://github.com/yourusername/student-organization-platform.git
+   cd student-organization-platform
+   ```
 
-    ```bash
-    python -m venv venv
-    source venv/bin/activate  # En Windows: venv\Scripts\activate
-    ```
-
-3. **Instalar Dependencias**:
-
+2. **Install dependencies**:
     ```bash
     pip install -r requirements.txt
     ```
 
-4. **Configurar la Base de Datos**:
+3. **Set up the database**:
+    ```bash
+    python manage.py migrate
+    ```
 
-    - Edita `settings.py` para configurar PostgreSQL si lo prefieres.
-    - Ejecuta migraciones:
-
-      ```bash
-      python manage.py makemigrations
-      python manage.py migrate
-      ```
-
-5. **Crear un Superusuario**:
-
+4. **Create a superuser** (optional, for admin access):
     ```bash
     python manage.py createsuperuser
     ```
 
-6. **Iniciar el Servidor de Desarrollo**:
-
+5. **Run the development server**:
     ```bash
     python manage.py runserver
     ```
 
-7. **Acceder a la Aplicación**:
+6. **Access the application**:
+    ```bash
+    Open your browser and navigate to http://127.0.0.1:8000/
+    ```
 
-    - Ve a `http://localhost:8000/` en tu navegador.
+## Additional Information
 
-## Tecnologías Utilizadas
+### Email Configuration
 
-- **Backend**: Django, Django ORM.
-- **Frontend**: HTML, CSS (Bootstrap), JavaScript.
-- **Librerías y APIs**:
-  - FullCalendar.js para el calendario.
-  - PDF.js para la previsualización de PDFs.
-  - NLTK/spaCy para procesamiento de lenguaje natural.
-  - Prism.js para resaltar sintaxis en archivos de programación.
+To enable the contact form to send emails, you need to configure the email settings in settings.py. For example:
+```bash
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+EMAIL_HOST = 'smtp.gmail.com'
+EMAIL_PORT = 587
+EMAIL_USE_TLS = True
+EMAIL_HOST_USER = 'your_email@gmail.com'
+EMAIL_HOST_PASSWORD = 'your_password'
+```
 
-## Consideraciones Adicionales
+### Security Considerations
 
-- **Seguridad**: Implementación de validaciones para la carga de archivos y protección de rutas.
-- **Escalabilidad**: Diseño modular que facilita la adición de nuevas funcionalidades.
-- **Despliegue**: Instrucciones para desplegar en plataformas como Heroku o AWS.
+Environment Variables: Sensitive information like email credentials should be stored in environment variables using python-decouple.
 
-## Licencia
+CSRF Protection: Django's built-in CSRF protection is enabled to secure forms.
 
-Este proyecto está licenciado bajo la Licencia MIT. Consulta el archivo [LICENSE](LICENSE) para más detalles.
+## Conclusion
+
+This project is a comprehensive platform designed to help students organize their academic lives. It combines file management, time management, and event planning into a single application, making it a unique and valuable tool. The integration of multiple functionalities, along with the use of diverse technologies, demonstrates both the distinctiveness and complexity of the project. I hope you enjoy using it as much as I enjoyed building it!

@@ -3,7 +3,17 @@
 {% block body %}
 <div class="container mt-4">
     <h2>Contacto</h2>
-    <form action="/send_message" method="post">
+    <p>Si tienes alguna pregunta o necesitas ayuda, no dudes en contactarnos, puedes hacerlo a través del correo que te
+        presentamos a continuación o mediante el formulario. <br />
+        Estamos aquí para ayudarte.</p>
+
+    <h3>Información de contacto</h3>
+    <p>Correo electrónico: <a href="mailto:jormarpaz01@gmail.com">jormarpaz01@gmail.com</a></p>
+    <p>Horario de atención: Lunes a Viernes de 9:00 a 20:00</p>
+
+    <h3>Formulario de contacto</h3>
+    <form id="contact-form" action="{% url 'send_message' %}" method="post">
+        {% csrf_token %}
         <div>
             <label for="name">Nombre:</label>
             <input type="text" id="name" name="name" required>
@@ -24,5 +34,114 @@
             <button type="submit">Enviar</button>
         </div>
     </form>
+
+    <h3>Preguntas frecuentes</h3>
+    <ul>
+        <li>
+            <a href="#" class="faq-question" data-target="faq1">¿Cómo puedo organizar mis archivos en carpetas?</a>
+            <div id="faq1" class="faq-answer" style="display: none;">
+                <p>Puedes crear carpetas desde la sección "Mis Archivos" haciendo clic en el botón "Crear Carpeta".
+                    Luego, puedes mover archivos a estas carpetas seleccionando el archivo y eligiendo la carpeta de
+                    destino.</p>
+            </div>
+        </li>
+        <li>
+            <a href="#" class="faq-question" data-target="faq2">¿Cómo uso el cronómetro de estudio?</a>
+            <div id="faq2" class="faq-answer" style="display: none;">
+                <p>En la sección "Cronómetro de Estudio", puedes configurar el tiempo de estudio, el tiempo de descanso
+                    y el número de ciclos. Luego, haz clic en "Comenzar" para iniciar el temporizador.</p>
+            </div>
+        </li>
+        <li>
+            <a href="#" class="faq-question" data-target="faq3">¿Cómo añado un evento en el calendario?</a>
+            <div id="faq3" class="faq-answer" style="display: none;">
+                <p>En la sección "Calendario", haz clic en cualquier fecha para abrir el formulario de evento. Completa
+                    los detalles del evento y haz clic en "Añadir evento" para guardarlo.</p>
+            </div>
+        </li>
+        <li>
+            <a href="#" class="faq-question" data-target="faq4">¿Cómo puedo compartir archivos con otros usuarios?</a>
+            <div id="faq4" class="faq-answer" style="display: none;">
+                <p>Actualmente, la plataforma no permite compartir archivos directamente con otros usuarios. Sin
+                    embargo, puedes descargar los archivos y compartirlos manualmente.</p>
+            </div>
+        </li>
+        <li>
+            <a href="#" class="faq-question" data-target="faq5">¿Cómo restablezco mi contraseña?</a>
+            <div id="faq5" class="faq-answer" style="display: none;">
+                <p>Si olvidaste tu contraseña, puedes restablecerla haciendo clic en "¿Olvidaste tu contraseña?" en la
+                    página de inicio de sesión. Sigue las instrucciones que recibirás por correo electrónico.</p>
+            </div>
+        </li>
+    </ul>
+
+    <h3>Síguenos en redes sociales</h3>
+    <p>
+        <a href="">Twitter</a> |
+        <a href="">Facebook</a> |
+        <a href="">Instagram</a>
+    </p>
 </div>
+
+<script>
+    document.getElementById('contact-form').addEventListener('submit', function (event) {
+        event.preventDefault();
+
+        // Mostrar un mensaje de carga
+        const submitButton = this.querySelector('button[type="submit"]');
+        submitButton.disabled = true;
+        submitButton.textContent = 'Enviando...';
+
+        fetch(this.action, {
+            method: 'POST',
+            body: new FormData(this),
+            headers: {
+                'X-CSRFToken': '{{ csrf_token }}'
+            }
+        })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    // Mostrar un mensaje de éxito
+                    alert('Gracias por tu mensaje. Nos pondremos en contacto contigo pronto.');
+                    document.getElementById('contact-form').reset();
+                } else {
+                    // Mostrar un mensaje de error
+                    alert('Hubo un error al enviar el mensaje: ' + (data.error || 'Inténtalo de nuevo.'));
+                }
+            })
+            .catch(error => {
+                // Mostrar un mensaje de error en caso de fallo en la solicitud
+                alert('Hubo un error al enviar el mensaje. Inténtalo de nuevo.');
+            })
+            .finally(() => {
+                // Restaurar el botón de enviar
+                submitButton.disabled = false;
+                submitButton.textContent = 'Enviar';
+            });
+    });
+</script>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        // Mostrar la respuesta al hacer clic en la pregunta
+        document.querySelectorAll('.faq-question').forEach(function (question) {
+            question.addEventListener('click', function (event) {
+                event.preventDefault();
+                var target = this.getAttribute('data-target');
+                var answer = document.getElementById(target);
+                answer.style.display = answer.style.display === 'none' ? 'block' : 'none';
+            });
+        });
+
+        // Ocultar la respuesta al hacer clic fuera
+        document.addEventListener('click', function (event) {
+            if (!event.target.classList.contains('faq-question')) {
+                document.querySelectorAll('.faq-answer').forEach(function (answer) {
+                    answer.style.display = 'none';
+                });
+            }
+        });
+    });
+</script>
 {% endblock %}

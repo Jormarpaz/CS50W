@@ -1,6 +1,6 @@
 {% extends "Capstone/layout.html" %}
 {% block title %}
-    Inicio
+Inicio
 {% endblock %}
 {% block body %}
 <div class="container mt-4">
@@ -9,36 +9,37 @@
     <h2>Tus archivos recientes: </h2>
     <ul>
         {% for file in user_files %}
-            <li><a href="{{ file.file.url }}">{{ file.name }}</a> - Subido el {{ file.date }}</li>
+        <li><a href="{{ file.file.url }}">{{ file.name }}</a> - Subido el {{ file.date }}</li>
         {% empty %}
-            <li>No tienes archivos subidos aún.</li>
-        {% endfor %} 
+        <li>No has subido archivos recientemente.</li>
+        {% endfor %}
     </ul>
 
     <!-- Sección de próximos eventos -->
     <h2>Próximos eventos:</h2>
     <ul>
         {% for event in upcoming_events %}
-            <li>
-                <strong>{{ event.title }}</strong> - 
-                {{ event.start|date:"d/m/Y" }}{% if event.start|time:"H:i" != "00:00" %} {{ event.start|time:"H:i" }}{% endif %}
-                {% if event.end %}
-                    a {{ event.end|date:"d/m/Y H:i" }}
-                {% endif %}
-            </li>
+        <li>
+            <strong>{{ event.title }}</strong> -
+            {{ event.start|date:"d/m/Y" }}{% if event.start|time:"H:i" != "00:00" %} {{ event.start|time:"H:i" }}{%
+            endif %}
+            {% if event.end %}
+            a {{ event.end|date:"d/m/Y H:i" }}
+            {% endif %}
+        </li>
         {% empty %}
-            <li>No hay eventos próximos.</li>
+        <li>No hay eventos próximos.</li>
         {% endfor %}
     </ul>
 
     <div style="display:inline-flex; gap: 5px;">
-        <a class="btn btn-secondary" href="{% url 'file-upload' %}">Subir un archivo</a>
+        <a class="btn btn-secondary" href="{% url 'files' %}">Subir un archivo</a>
         <a class="btn btn-danger" href="{% url 'logout' %}">Cerrar sesión</a>
     </div>
 
     {% else %}
-        <h1>Bienvenid@!</h1>
-        <p><a href="{% url 'login' %}">Iniciar sesión</a> o <a href="{% url 'register' %}">Regístrate</a> para comenzar.</p>
+    <h1>Bienvenid@!</h1>
+    <p><a href="{% url 'login' %}">Iniciar sesión</a> o <a href="{% url 'register' %}">Regístrate</a> para comenzar.</p>
     {% endif %}
 </div>
 {% endblock %}

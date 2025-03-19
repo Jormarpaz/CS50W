@@ -7,31 +7,32 @@
 {% block body %}
 
 <div class="container mt-4">
-    <h1>Archivos en {{ folder.name }}</h1>
+  <h1>Archivos en {{ folder.name }}</h1>
 
-    <!-- Subcarpetas -->
-    <h2>Subcarpetas</h2>
+  <!-- Subcarpetas -->
+  <h2>Subcarpetas</h2>
   <ul id="subfolder-container">
     {% for subfolder in subfolders %}
-    <li class="folder" ondrop="drop(event)" ondragover="allowDrop(event)" data-folder-id="{{ subfolder.id }}">
+    <li class="folder" data-folder-id="{{ subfolder.id }}">
       <div class="subfolder-container">
-        <input type="checkbox" id="folder-{{ folder.id }}" class="delete-checkbox" value="{{ subfolder.id }}" style="display: none" data-type="folder" />
-        <label for="folder-{{ folder.id }}"><a href="{% url 'folder_files' subfolder.id %}">{{ subfolder.name }}</a></label>
+        <input type="checkbox" class="delete-checkbox" value="{{ subfolder.id }}" style="display: none"
+          data-type="folder" />
+        <a href="{% url 'folder_files' subfolder.id %}">{{ subfolder.name }}</a>
       </div>
-
     </li>
     {% empty %}
     <li>No hay subcarpetas</li>
     {% endfor %}
   </ul>
 
+  <!-- Archivos en la carpeta -->
   <h2>Archivos</h2>
   <ul id="file-container">
     {% for file in files %}
-    <li class="file" draggable="true" ondragstart="drag(event)" data-file-id="{{ file.id }}">
+    <li class="file" data-file-id="{{ file.id }}">
       <div class="file-container">
         <input type="checkbox" class="delete-checkbox" value="{{ file.id }}" style="display: none" data-type="file" />
-      <a href="{{ file.file.url }}">{{ file.name }}</a> - {{ file.date }}
+        <a href="{{ file.file.url }}">{{ file.name }}</a> - {{ file.date }}
       </div>
     </li>
     {% empty %}
@@ -39,12 +40,15 @@
     {% endfor %}
   </ul>
 
+  <!-- Botones de acciones -->
   <div class="d-flex flex-column">
     <div class="d-flex justify-content-start mt-2">
       <a class="btn btn-secondary" href="{% url 'upload_file_in_folder' folder.id %}">Subir Archivo</a>
       <button class="btn btn-danger btn-sm" onclick="toggleFileCheckboxes()">Eliminar Archivo</button>
-      <button type="button" class="btn btn-danger" onclick="confirmDelete()" style="display: none" id="confirm-delete">Confirmar</button>
-      <button type="button" class="btn btn-secondary" onclick="cancelDelete()" style="display: none" id="cancel-delete">Cancelar</button>
+      <button type="button" class="btn btn-danger" onclick="confirmDelete()" style="display: none"
+        id="confirm-delete">Confirmar</button>
+      <button type="button" class="btn btn-secondary" onclick="cancelDelete()" style="display: none"
+        id="cancel-delete">Cancelar</button>
     </div>
     <div class="d-flex justify-content-start mt-1">
       <a class="btn btn-secondary" href="{% url 'create_subfolder_in_folder' folder.id %}">Crear Subcarpeta</a>
@@ -52,11 +56,24 @@
     </div>
   </div>
 
-  <a class="btn btn-primary mt-3" href="{% url 'files' %}">Volver a Mis Archivos</a>
+  <!-- Botones para volver -->
+  <div class="d-flex justify-content-start mt-3">
+    <!-- Botón para volver a la vista principal -->
+    <a class="btn btn-primary mr-2" href="{% url 'files' %}">Volver a Mis Archivos</a>
+
+    <!-- Botón para volver a la carpeta padre -->
+    {% if folder.parent %}
+    <a class="btn btn-primary" href="{% url 'folder_files' folder.parent.id %}">Volver a la carpeta anterior</a>
+    {% endif %}
+
+
+  </div>
 </div>
+
+<!-- Scripts -->
 <script>
-  const FILE_UPLOAD_URL = "{% url 'file-upload' %}";  
-  const CREATE_FOLDER_URL = "{% url 'create_folder' %}";  
+  const FILE_UPLOAD_URL = "{% url 'file-upload' %}";
+  const CREATE_FOLDER_URL = "{% url 'create_folder' %}";
   const CREATE_SUBFOLDER_URL = "{% url 'create_subfolder_in_folder' folder.id %}";
   const SUBFILE_UPLOAD_URL = "{% url 'upload_file_in_folder' folder.id %}";
   const MOVE_FILE_URL = "{% url 'move_file' %}";

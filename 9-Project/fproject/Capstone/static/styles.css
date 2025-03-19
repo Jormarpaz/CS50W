@@ -4,21 +4,21 @@
 */
 /*****************************************************/
 body {
-    font-family: 'Roboto', sans-serif;
-    background-color: #f5f5f5;
-    color: #333;
-    margin: 0;
-    padding: 0;
+  font-family: "Roboto", sans-serif;
+  background-color: #f5f5f5;
+  color: #333;
+  margin: 0;
+  padding: 0;
 }
 
 /* Container */
 .container {
-    width: 80%;
-    margin: 0 auto;
-    padding: 20px;
-    background-color: #fff;
-    border-radius: 10px;
-    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+  width: 80%;
+  margin: 0 auto;
+  padding: 20px;
+  background-color: #fff;
+  border-radius: 10px;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
 }
 
 /*****************************************************/
@@ -31,7 +31,6 @@ body {
 */
 /*****************************************************/
 
-
 /*****************************************************/
 /*****************************************************/
 /*****************************************************/
@@ -43,30 +42,35 @@ body {
 /*****************************************************/
 
 /* Headings */
-h1, h2, h3, h4, h5, h6 {
-    color: #2c3e50;
-    margin-bottom: 20px;
-    font-family: 'Roboto Slab', serif;
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  color: #2c3e50;
+  margin-bottom: 20px;
+  font-family: "Roboto Slab", serif;
 }
 
 h2 {
-    margin-top: 10px;
+  margin-top: 10px;
 }
 
 /* Paragraphs */
 p {
-    line-height: 1.6;
-    margin-bottom: 20px;
+  line-height: 1.6;
+  margin-bottom: 20px;
 }
 
 /* Links */
 a {
-    color: #3498db;
-    text-decoration: none;
+  color: #3498db;
+  text-decoration: none;
 }
 
 a:hover {
-    text-decoration: underline;
+  text-decoration: underline;
 }
 
 /*****************************************************/
@@ -80,39 +84,44 @@ a:hover {
 /*****************************************************/
 
 /* Estilo para los contenedores de archivos y carpetas */
-.file-container, .folder-container .subfolder-container {
-    display: flex; /* Usa flexbox para alinear elementos */
-    align-items: center; /* Centra verticalmente los elementos */
-    gap: 8px; /* Espacio entre el checkbox y el nombre */
-    white-space: nowrap; /* Evita que los elementos se rompan */
+.file-container,
+.folder-container,
+.subfolder-container {
+  display: flex; /* Usa flexbox para alinear elementos */
+  align-items: center; /* Centra verticalmente los elementos */
+  gap: 8px; /* Espacio entre el checkbox y el nombre */
+  white-space: nowrap; /* Evita que los elementos se rompan */
 }
 
 /* Estilo para los checkboxes */
 .delete-checkbox {
-    display: none; /* Inicialmente oculto */
-    margin: 0; /* Elimina cualquier margen */
-    padding: 0; /* Elimina cualquier padding */
+  display: none; /* Inicialmente oculto */
+  margin: 0; /* Elimina cualquier margen */
+  padding: 0; /* Elimina cualquier padding */
 }
 
 /* Estilo para los checkboxes cuando están visibles */
 .delete-checkbox[style*="inline-block"] {
-    display: inline-block !important; /* Fuerza la visibilidad */
+  display: inline-block !important; /* Fuerza la visibilidad */
+  margin-right: 8px; /* Espacio entre el checkbox y el texto */
 }
 
 /* Estilo para los elementos <li> que contienen un checkbox visible */
-li:has(.delete-checkbox[style*="inline-block"]) {
-    display: flex; /* Aplica flex solo cuando el checkbox está visible */
-    align-items: center; /* Alinea verticalmente */
-    gap: 8px; /* Espacio entre el checkbox y el texto */
-    margin: 0;
-    padding: 0;
+li .delete-checkbox[style*="inline-block"] {
+  display: inline-block !important; /* Fuerza la visibilidad */
+  margin-right: 8px; /* Espacio entre el checkbox y el texto */
 }
 
-
+/* Asegurar que los elementos <li> con checkboxes visibles usen flexbox */
+li:has(.delete-checkbox[style*="inline-block"]) {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
 
 .empty-message {
-    list-style-type: disc !important; /* Fuerza el marcador */
-    display: list-item !important; /* Asegura que sea tratado como <li> */ 
+  list-style-type: disc !important; /* Fuerza el marcador */
+  display: list-item !important; /* Asegura que sea tratado como <li> */
 }
 
 /*****************************************************/
@@ -126,16 +135,18 @@ li:has(.delete-checkbox[style*="inline-block"]) {
 /*****************************************************/
 
 #timer {
-    font-size: 48px;
-    font-weight: bold;
-    margin: 20px 0;
+  font-size: 48px;
+  font-weight: bold;
+  margin: 20px 0;
 }
 
-#startTimer, #pauseTimer, #resetTimer {
-    margin: 10px;
-    padding: 10px 20px;
-    font-size: 16px;
-    cursor: pointer;
+#startTimer,
+#pauseTimer,
+#resetTimer {
+  margin: 10px;
+  padding: 10px 20px;
+  font-size: 16px;
+  cursor: pointer;
 }
 
 /*****************************************************/
@@ -148,34 +159,35 @@ li:has(.delete-checkbox[style*="inline-block"]) {
 */
 /*****************************************************/
 button {
-    background-color: #3498db;
-    color: #fff;
-    border: none;
-    padding: 10px 20px;
-    border-radius: 5px;
-    cursor: pointer;
-    transition: background-color 0.3s ease;
+  background-color: #3498db;
+  color: #fff;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
 }
 
 button:hover {
-    background-color: #2980b9;
+  background-color: #2980b9;
 }
 
 .btn-secondary {
-    margin-top: 5px;
-    margin-right: 5px;
+  margin-top: 5px;
+  margin-right: 5px;
 }
 
 .btn-danger {
-    margin-top: 5px;
-    padding: 5px 10px;
-    font-size: 16px;
+  margin-top: 5px;
+  padding: 5px 10px;
+  font-size: 16px;
 }
 
 /* Estilo para los botones */
-.btn-secondary, .btn-danger {
-    margin-top: 5px;
-    margin-right: 5px;
+.btn-secondary,
+.btn-danger {
+  margin-top: 5px;
+  margin-right: 5px;
 }
 
 /*****************************************************/
@@ -189,64 +201,57 @@ button:hover {
 /*****************************************************/
 
 #calendar {
-    max-width: 100%;
-    margin: 0 auto;
-    padding: auto;
-    height: 700px; 
+  max-width: 100%;
+  margin: 0 auto;
+  padding: auto;
+  height: 700px;
 }
 
-form { 
-    position: relative; /* Change to relative */
-    margin: 20px auto; /* Center the form horizontally */
-    background-color: white;
-    padding: 20px;
-    border: 1px solid #ccc;
-    border-radius: 5px;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+form {
+  position: relative; /* Change to relative */
+  margin: 20px auto; /* Center the form horizontally */
+  background-color: white;
+  padding: 20px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
 }
 
 .form-group {
-    margin-bottom: 15px;
+  margin-bottom: 15px;
 }
 
 .form-control {
-    width: 100%;
-    padding: 10px;
-    margin-bottom: 10px;
-    border: 1px solid #ccc;
-    border-radius: 4px;
+  width: 100%;
+  padding: 10px;
+  margin-bottom: 10px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
 }
 
 .btn-primary {
-    background-color: #007bff;
-    color: white;
-    border: none;
-    padding: 10px 20px;
-    border-radius: 4px;
-    cursor: pointer;
+  background-color: #007bff;
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 4px;
+  cursor: pointer;
 }
 
 .btn-primary:hover {
-    background-color: #0056b3;
+  background-color: #0056b3;
 }
 
 .input-no-outline:focus {
-    outline: none;
-    box-shadow: none;
+  outline: none;
+  box-shadow: none;
 }
 
-/*input[type="checkbox"] {
-    margin-top: -38px;
-    margin-left: -130px;
-    transform: scale(0.5);
-}*/
-
 a[id="editar"] {
-    
-    &:hover {
-        text-decoration: underline;
-        color: blue;
-    }
+  &:hover {
+    text-decoration: underline;
+    color: blue;
+  }
 }
 
 /*****************************************************/
@@ -258,17 +263,19 @@ a[id="editar"] {
     Inputs y Textareas
 */
 /*****************************************************/
-input, textarea {
-    width: 100%;
-    padding: 10px;
-    margin-bottom: 20px;
-    border: 1px solid #ccc;
-    border-radius: 5px;
+input,
+textarea {
+  width: 100%;
+  padding: 10px;
+  margin-bottom: 20px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
 }
 
-input:focus, textarea:focus {
-    border-color: #3498db;
-    outline: none;
+input:focus,
+textarea:focus {
+  border-color: #3498db;
+  outline: none;
 }
 
 /*****************************************************/
@@ -280,14 +287,15 @@ input:focus, textarea:focus {
     Listas
 */
 /*****************************************************/
-ul, ol {
-    margin-bottom: 20px;
-    padding-left: 20px;
-    list-style-type: disc;
+ul,
+ol {
+  margin-bottom: 20px;
+  padding-left: 20px;
+  list-style-type: disc;
 }
 
 li {
-    margin-bottom: 10px;
+  margin-bottom: 10px;
 }
 
 /*****************************************************/
@@ -301,18 +309,18 @@ li {
 /*****************************************************/
 
 nav {
-    background-color: #2c3e50;
-    padding: 10px;
-    border-radius: 5px;
+  background-color: #2c3e50;
+  padding: 10px;
+  border-radius: 5px;
 }
 
 nav a {
-    color: #ecf0f1;
-    margin: 0 10px;
+  color: #ecf0f1;
+  margin: 0 10px;
 }
 
 nav a:hover {
-    color: #3498db;
+  color: #3498db;
 }
 
 /*****************************************************/

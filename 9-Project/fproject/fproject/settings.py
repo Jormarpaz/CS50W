@@ -11,6 +11,7 @@ https://docs.djangoproject.com/en/5.1/ref/settings/
 """
 
 from pathlib import Path
+from decouple import config
 import os
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
@@ -109,7 +110,7 @@ AUTH_USER_MODEL = 'Capstone.User'
 
 LANGUAGE_CODE = 'en-us'
 
-TIME_ZONE = 'UTC'
+TIME_ZONE = 'Europe/Madrid'
 
 USE_I18N = True
 
@@ -129,3 +130,15 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
+
+# Configuración de correo electrónico
+# Backend para enviar correos
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+# Servidor SMTP de Gmail (cambia si usas otro proveedor)
+EMAIL_HOST = 'smtp.gmail.com'
+EMAIL_PORT = 587  # Puerto para SMTP (TLS)
+EMAIL_USE_TLS = True  # Usar TLS para conexiones seguras
+# Tu dirección de correo electrónico
+EMAIL_HOST_USER = config('EMAIL_HOST_USER')
+# Tu contraseña de correo electrónico
+EMAIL_HOST_PASSWORD = config('EMAIL_HOST_PASSWORD')
