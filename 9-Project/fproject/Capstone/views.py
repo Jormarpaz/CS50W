@@ -15,16 +15,14 @@ import os
 from .models import User, File, Folder, Event
 from . import forms
 
-# Create your views here.
-
 
 def index(request):
     if request.user.is_authenticated:
         user_files = File.objects.filter(
-            user=request.user).order_by("-date")
+            user=request.user).order_by("-date")[:4] # Obtener los 4 archivos más recientes
         now = timezone.now()
         upcoming_events = Event.objects.filter(
-            user=request.user, start__gte=now).order_by('start')[:4]
+            user=request.user, start__gte=now).order_by('start')[:4] # Obtener los 4 eventos próximos
         return render(request, "Capstone/index.html", {
             "user_files": user_files,
             "upcoming_events": upcoming_events,

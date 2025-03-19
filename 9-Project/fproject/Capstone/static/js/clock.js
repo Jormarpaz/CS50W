@@ -9,8 +9,10 @@ document.addEventListener("DOMContentLoaded", function () {
   const timerDisplay = document.getElementById("timer");
   const minutesDisplay = document.getElementById("minutes");
   const secondsDisplay = document.getElementById("seconds");
-  const studyTimeInput = document.getElementById("studyTime");
-  const breakTimeInput = document.getElementById("breakTime");
+  const studyTimeMinutesInput = document.getElementById("studyTime");
+  const studyTimeSecondsInput = document.getElementById("studyTimeSeconds");
+  const breakTimeMinutesInput = document.getElementById("breakTime");
+  const breakTimeSecondsInput = document.getElementById("breakTimeSeconds");
   const cyclesInput = document.getElementById("cycles");
   const startButton = document.getElementById("startTimer");
   const pauseButton = document.getElementById("pauseTimer");
@@ -25,9 +27,13 @@ document.addEventListener("DOMContentLoaded", function () {
       cyclesLeft = parseInt(cyclesInput.value);
     }
     if (isStudyTime) {
-      timeLeft = parseInt(studyTimeInput.value) * 60;
+      const studyMinutes = parseInt(studyTimeMinutesInput.value) || 0;
+      const studySeconds = parseInt(studyTimeSecondsInput.value) || 0;
+      timeLeft = studyMinutes * 60 + studySeconds;
     } else {
-      timeLeft = parseInt(breakTimeInput.value) * 60;
+      const breakMinutes = parseInt(breakTimeMinutesInput.value) || 0;
+      const breakSeconds = parseInt(breakTimeSecondsInput.value) || 0;
+      timeLeft = breakMinutes * 60 + breakSeconds;
     }
     soundPlayed = false;
     breakSoundPlayed = false;

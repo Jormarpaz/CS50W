@@ -3,12 +3,38 @@
     General styles
 */
 /*****************************************************/
+html, body {
+  background: linear-gradient(to right, #18230F, #27391C, #255F38, #1F7D53);
+}
 body {
   font-family: "Roboto", sans-serif;
-  background-color: #f5f5f5;
-  color: #333;
+  /*background-color: #e0f7fa; /*#f5f5f5*/
+  color: white; /*333*/
   margin: 0;
   padding: 0;
+}
+
+.mt-4, .navbar-expand-lg {
+  background: linear-gradient(to right, #18230F, #27391C, #255F38, #1F7D53);
+}
+
+.mt-4 {
+  box-shadow: rgba(50, 50, 93, 0.25) 0px 50px 100px -20px, rgba(0, 0, 0, 0.3) 0px 30px 60px -30px, rgba(10, 37, 64, 0.35) 0px -2px 6px 0px inset !important;
+}
+
+.navbar-expand-lg {
+  border-bottom: 2px solid #18230F;
+}
+
+th, td {
+  border: 1px solid white;
+  color: white;
+}
+
+#contact-form {
+  background: linear-gradient(to right, #18230F, #27391C, #255F38, #1F7D53);
+  border: none;
+  box-shadow: rgba(50, 50, 93, 0.25) 0px 50px 100px -20px, rgba(0, 0, 0, 0.3) 0px 30px 60px -30px, rgba(10, 37, 64, 0.35) 0px -2px 6px 0px inset;
 }
 
 /* Container */
@@ -48,7 +74,7 @@ h3,
 h4,
 h5,
 h6 {
-  color: #2c3e50;
+  color: white;
   margin-bottom: 20px;
   font-family: "Roboto Slab", serif;
 }
@@ -308,6 +334,7 @@ li {
 */
 /*****************************************************/
 
+/*
 nav {
   background-color: #2c3e50;
   padding: 10px;
@@ -323,6 +350,7 @@ nav a:hover {
   color: #3498db;
 }
 
+*/
 /*****************************************************/
 /*****************************************************/
 /*****************************************************/

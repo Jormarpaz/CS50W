@@ -46,6 +46,10 @@
               data-event-id="{{ event.id }}">Eliminar</button>
           </td>
         </tr>
+        {% empty %}
+        <tr>
+          <td colspan="4">No hay eventos para mostrar.</td>
+        </tr>
         {% endfor %}
       </tbody>
     </table>

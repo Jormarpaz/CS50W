@@ -21,8 +21,8 @@ Inicio
         {% for event in upcoming_events %}
         <li>
             <strong>{{ event.title }}</strong> -
-            {{ event.start|date:"d/m/Y" }}{% if event.start|time:"H:i" != "00:00" %} {{ event.start|time:"H:i" }}{%
-            endif %}
+            {{ event.start|date:"d/m/Y" }}{% if event.start|time:"H:i" != "00:00" %} {{ event.start|time:"H:i" }}
+            {% endif %}
             {% if event.end %}
             a {{ event.end|date:"d/m/Y H:i" }}
             {% endif %}

@@ -10,7 +10,7 @@
   <h2>Carpetas</h2>
   <ul id="folder-container">
     {% for folder in folders %}
-    <li class="folder" data-folder-id="{{ folder.id }}">
+    <li class="folder" data-folder-id="{{ folder.id }}" ondragover="allowDrop(event)" ondrop="drop(event)">
       <div class="folder-container">
         <input type="checkbox" class="delete-checkbox" value="{{ folder.id }}" style="display: none"
           data-type="folder" />
@@ -29,7 +29,7 @@
   <h2>Archivos en la raíz</h2>
   <ul id="root-folder">
     {% for file in user_files %}
-    <li class="file" data-file-id="{{ file.id }}">
+    <li class="file" data-file-id="{{ file.id }}" draggable="true" ondragstart="drag(event)">
       <div class="file-container">
         <input type="checkbox" class="delete-checkbox" value="{{ file.id }}" style="display: none" data-type="file" />
         <a href="{{ file.file.url }}">{{ file.name }}</a> - {{ file.date }}
