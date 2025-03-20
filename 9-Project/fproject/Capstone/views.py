@@ -19,10 +19,10 @@ from . import forms
 def index(request):
     if request.user.is_authenticated:
         user_files = File.objects.filter(
-            user=request.user).order_by("-date")[:4] # Obtener los 4 archivos más recientes
+            user=request.user).order_by("-date")[:4]
         now = timezone.now()
         upcoming_events = Event.objects.filter(
-            user=request.user, start__gte=now).order_by('start')[:4] # Obtener los 4 eventos próximos
+            user=request.user, start__gte=now).order_by('start')[:4] 
         return render(request, "Capstone/index.html", {
             "user_files": user_files,
             "upcoming_events": upcoming_events,
@@ -259,29 +259,26 @@ def calendar(request):
         try:
             # Leer los datos JSON enviados
             data = json.loads(request.body)
-            # Depuración: Verificar los datos recibidos
             print("Datos recibidos:", data)
 
             # Si es "todo el día", ajustar los campos start y end
             if data.get("allDay", False):
-                data["start"] = data.get("start")  # Solo la fecha (sin hora)
-                data["end"] = None  # No hay hora de fin
+                data["start"] = data.get("start")  
+                data["end"] = None  
 
             # Crear el formulario con los datos recibidos
             form = forms.EventForm(data)
             if form.is_valid():
                 event = form.save(commit=False)
-                event.user = request.user  # Asignar el evento al usuario actual
+                event.user = request.user  
                 event.save()
                 return JsonResponse({"success": True})
             else:
                 # Si el formulario no es válido, devolver los errores
-                # Depuración: Verificar los errores
                 print("Errores del formulario:", form.errors)
                 return JsonResponse({"success": False, "errors": form.errors}, status=400)
         except Exception as e:
             # Manejar cualquier excepción
-            # Depuración: Verificar la excepción
             print("Error en la vista calendar:", e)
             return JsonResponse({"success": False, "error": str(e)}, status=500)
 
@@ -299,7 +296,7 @@ def calendar(request):
     ]
 
     return render(request, "Capstone/calendar.html", {
-        "events_data": json.dumps(events_data),  # Pasar los eventos como JSON
+        "events_data": json.dumps(events_data), 
         "events": user_events,
     })
 
@@ -371,8 +368,8 @@ def send_message(request):
             send_mail(
                 f'Mensaje de contacto: {subject}',
                 f'Nombre: {name}\nCorreo: {email}\nMensaje: {message}',
-                settings.EMAIL_HOST_USER,  # Cambia esto por tu correo
-                [settings.EMAIL_HOST_USER],  # Cambia esto por tu correo
+                settings.EMAIL_HOST_USER,  
+                [settings.EMAIL_HOST_USER],  
                 fail_silently=False,
             )
 

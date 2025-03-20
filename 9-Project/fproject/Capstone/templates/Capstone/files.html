@@ -33,10 +33,11 @@
       <div class="file-container">
         <input type="checkbox" class="delete-checkbox" value="{{ file.id }}" style="display: none" data-type="file" />
         <a href="{{ file.file.url }}">{{ file.name }}</a> - {{ file.date }}
+        {% if file.tags %}
+        <span class="badge badge-info">{{ file.tags }}</span>
+        {% endif %}
       </div>
-      {% if file.tags %}
-      <span class="badge badge-info">{{ file.tags }}</span>
-      {% endif %}
+
     </li>
     {% empty %}
     <li class="empty-message">No hay archivos en la raíz</li>

@@ -13,7 +13,7 @@
   <h2>Subcarpetas</h2>
   <ul id="subfolder-container">
     {% for subfolder in subfolders %}
-    <li class="folder" data-folder-id="{{ subfolder.id }}">
+    <li class="folder" data-folder-id="{{ subfolder.id }}" ondragover="allowDrop(event)" ondrop="drop(event)">
       <div class="subfolder-container">
         <input type="checkbox" class="delete-checkbox" value="{{ subfolder.id }}" style="display: none"
           data-type="folder" />
@@ -29,10 +29,13 @@
   <h2>Archivos</h2>
   <ul id="file-container">
     {% for file in files %}
-    <li class="file" data-file-id="{{ file.id }}">
+    <li class="file" data-file-id="{{ file.id }}" draggable="true" ondragstart="drag(event)">
       <div class="file-container">
         <input type="checkbox" class="delete-checkbox" value="{{ file.id }}" style="display: none" data-type="file" />
         <a href="{{ file.file.url }}">{{ file.name }}</a> - {{ file.date }}
+        {% if file.tags %}
+        <span class="badge badge-info">{{ file.tags }}</span>
+        {% endif %}
       </div>
     </li>
     {% empty %}
@@ -58,10 +61,8 @@
 
   <!-- Botones para volver -->
   <div class="d-flex justify-content-start mt-3">
-    <!-- Botón para volver a la vista principal -->
     <a class="btn btn-primary mr-2" href="{% url 'files' %}">Volver a Mis Archivos</a>
 
-    <!-- Botón para volver a la carpeta padre -->
     {% if folder.parent %}
     <a class="btn btn-primary" href="{% url 'folder_files' folder.parent.id %}">Volver a la carpeta anterior</a>
     {% endif %}

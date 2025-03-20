@@ -158,7 +158,7 @@
       },
 
       dateClick: function (info) {
-        selectedDate = info.dateStr; // Asignar el valor a selectedDate
+        selectedDate = info.dateStr; 
         var form = document.getElementById("event-form");
         form.style.display = "block";
         document.getElementById("event-start").value = selectedDate + "T00:00";
@@ -172,10 +172,9 @@
           var allDay = document.getElementById("event-all-day").checked;
 
           if (allDay) {
-            start = selectedDate; // Usar selectedDate
+            start = selectedDate; 
             end = null;
           } else {
-            // Asegúrate de que start y end tengan valores válidos
             if (start) {
               start = new Date(selectedDate + "T" + start).toISOString();
             } else {
@@ -224,15 +223,12 @@
     calendar.render();
 
     window.editEvent = function (eventId) {
-      // Obtener el evento del calendario
       var event = calendar.getEventById(eventId);
 
       if (event) {
-        // Convertir las horas a la hora local del navegador
         var startTime = event.start ? new Date(event.start).toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit' }) : '';
         var endTime = event.end ? new Date(event.end).toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit' }) : '';
 
-        // Crear un contenedor para el formulario de edición
         var editFormContainer = document.createElement("div");
         editFormContainer.id = "edit-event-form-container";
         editFormContainer.innerHTML = `
@@ -274,11 +270,9 @@
         // Añadir el formulario al cuerpo del documento
         document.body.appendChild(editFormContainer);
 
-        // Manejar el envío del formulario
         document.getElementById("edit-event-form").onsubmit = function (e) {
           e.preventDefault();
 
-          // Obtener los valores del formulario
           var title = document.getElementById("edit-event-title").value;
           var startTime = document.getElementById("edit-event-start").value;
           var endTime = document.getElementById("edit-event-end").value;
@@ -292,7 +286,7 @@
 
           // Crear las nuevas fechas con la misma fecha pero con la hora modificada
           var newStart = new Date(event.start);
-          var newEnd = new Date(event.end || event.start); // Si no hay fecha de fin, usamos la de inicio
+          var newEnd = new Date(event.end || event.start); 
 
           // Actualizar solo la hora
           newStart.setHours(startTime.split(":")[0], startTime.split(":")[1]);
@@ -304,12 +298,11 @@
             newEnd.setHours(23, 59, 59, 999);
           }
 
-          // Enviar los cambios al servidor
           fetch(`/calendar/event/${eventId}/edit/`, {
             method: "PUT",
             headers: {
               "Content-Type": "application/json",
-              "X-CSRFToken": "{{ csrf_token }}", // Asegúrate de incluir el token CSRF
+              "X-CSRFToken": "{{ csrf_token }}", 
             },
             body: JSON.stringify({
               title: title,
@@ -321,9 +314,6 @@
             .then((response) => response.json())
             .then((data) => {
               if (data.success) {
-                // Recargar la página para reflejar los cambios
-                //location.reload();
-                // Actualizar el evento en el calendario
                 event.setProp("title", title);
                 event.setStart(newStart);
                 event.setEnd(newEnd);
@@ -347,9 +337,6 @@
               console.error("Error:", error);
               alert("Hubo un error al guardar los cambios.");
             });
-
-          // Cerrar el formulario después de guardar
-          //document.body.removeChild(editFormContainer);
         };
       }
     };

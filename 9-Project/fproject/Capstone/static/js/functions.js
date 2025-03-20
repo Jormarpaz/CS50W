@@ -32,7 +32,7 @@ function drop(event) {
     .then((response) => response.json())
     .then((data) => {
       if (data.success) {
-        location.reload(); // Recargar la página para reflejar los cambios
+        location.reload(); 
       } else {
         console.error("Error al mover el archivo:", data.error);
       }

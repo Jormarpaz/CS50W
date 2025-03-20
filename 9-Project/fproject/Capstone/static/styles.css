@@ -5,18 +5,18 @@
 /*****************************************************/
 html,
 body {
-  background-color: #f4f4f4; /* Fondo claro */
+  background-color: #f4f4f4; 
   font-family: Arial, sans-serif;
-  color: #333333; /* Texto principal */
+  color: #333333; 
   margin: 0;
   padding: 0;
 }
 
 .navbar {
-  background-color: #34495e; /* Barra de navegación oscura */
+  background-color: #34495e; 
   color: #ffffff;
   padding: 10px 20px;
-  border-bottom: 2px solid #18230f; /* Borde inferior */
+  border-bottom: 2px solid #18230f; 
 }
 
 .nav-item {
@@ -29,9 +29,9 @@ body {
   width: 80%;
   margin: 20px auto;
   padding: 20px;
-  background-color: #ffffff; /* Fondo blanco para el contenedor */
+  background-color: #ffffff; 
   border-radius: 10px;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Sombra suave */
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); 
 }
 
 .container[id="event-list-container"] {
@@ -44,7 +44,7 @@ body {
 */
 /*****************************************************/
 button {
-  background-color: #3498db; /* Azul brillante */
+  background-color: #3498db; 
   color: #ffffff;
   border: none;
   padding: 10px 20px;
@@ -54,17 +54,21 @@ button {
 }
 
 button:hover {
-  background-color: #2980b9; /* Azul más oscuro al pasar el mouse */
+  background-color: #2980b9; 
 }
 
 .btn-secondary {
-  background-color: #6c757d; /* Gris para botones secundarios */
+  background-color: #6c757d; 
   margin-top: 5px;
   margin-right: 5px;
 }
 
+#cancel-delete{
+  margin-left: 5px;
+}
+
 .btn-danger {
-  background-color: #dc3545; /* Rojo para botones de peligro */
+  background-color: #dc3545; 
   margin-top: 5px;
   padding: 5px 10px;
   font-size: 16px;
@@ -75,6 +79,7 @@ button:hover {
   padding: 5px 10px;
   font-size: 16px;
 }
+
 
 /*****************************************************/
 /* 
@@ -95,7 +100,7 @@ textarea {
 
 input:focus,
 textarea:focus {
-  border-color: #3498db; /* Borde azul al enfocar */
+  border-color: #3498db; 
   outline: none;
 }
 
@@ -110,7 +115,7 @@ h3,
 h4,
 h5,
 h6 {
-  color: #333333; /* Texto oscuro para títulos */
+  color: #333333; 
   margin-top: 5px;
   margin-bottom: 20px;
   font-family: "Roboto Slab", serif;
@@ -130,7 +135,7 @@ p {
 }
 
 a {
-  color: #3498db; /* Azul para enlaces */
+  color: #3498db; 
   text-decoration: none;
 }
 
@@ -155,9 +160,9 @@ li {
 }
 
 table th, table td {
-  padding: 10px; /* Espaciado interno */
-  text-align: left; /* Alineación del texto */
-  background-color: #ffffff; /* Fondo blanco para celdas */
+  padding: 10px; 
+  text-align: left; 
+  background-color: #ffffff; 
 }
 
 /*****************************************************/
@@ -169,22 +174,22 @@ table th, table td {
   max-width: 100%;
   margin: 0 auto;
   padding: auto;
-  height: auto; /*700px*/
+  height: auto; 
 }
 
 @media (max-width: 768px) {
 
   .fc-header-toolbar {
-    flex-direction: column; /* Apila los botones en móviles */
+    flex-direction: column; 
     align-items: flex-start;
   }
 
   .fc-toolbar-title {
-    font-size: 1.2em; /* Reduce el tamaño del título */
+    font-size: 1.2em; 
   }
 
   .fc-button {
-    font-size: 0.8em; /* Reduce el tamaño de los botones */
+    font-size: 0.8em; 
     padding: 5px 10px;
   }
 }
@@ -256,11 +261,11 @@ li:has(.delete-checkbox[style*="inline-block"]) {
 */
 /*****************************************************/
 #contact-form {
-  background: #ffffff; /* Fondo blanco */
-  border: 1px solid #cccccc; /* Borde gris */
-  padding: 20px; /* Espaciado interno */
-  border-radius: 8px; /* Bordes redondeados */
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Sombra suave */
+  background: #ffffff; 
+  border: 1px solid #cccccc; 
+  padding: 20px; 
+  border-radius: 8px; 
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); 
 }
 
 
@@ -272,23 +277,23 @@ li:has(.delete-checkbox[style*="inline-block"]) {
 
 .table-responsive {
   width: 100%;
-  overflow-x: auto; /* Permite el desplazamiento horizontal */
-  -webkit-overflow-scrolling: touch; /* Mejora el desplazamiento en dispositivos táctiles */
+  overflow-x: auto; 
+  -webkit-overflow-scrolling: touch; 
 }
 
 .table-responsive table {
-  min-width: 600px; /* Ancho mínimo para la tabla */
+  min-width: 600px; 
   width: 100%;
 }
 
 @media (max-width: 768px) {
   .table-responsive table {
-    min-width: 100%; /* Ajusta el ancho de la tabla al 100% en móviles */
+    min-width: 100%; 
   }
 
   .table-responsive th,
   .table-responsive td {
-    white-space: nowrap; /* Evita que el texto se divida en varias líneas */
-    padding: 8px; /* Reduce el padding para ahorrar espacio */
+    white-space: nowrap; 
+    padding: 8px; 
   }
 }

@@ -80,13 +80,12 @@ document.addEventListener("DOMContentLoaded", function () {
     }
     if (isStudyTime && timeLeft <= 5 && !soundPlayed) {
       studyEndSound.play();
-      soundPlayed = true; // Marcar que el sonido ya se reprodujo
+      soundPlayed = true; 
     }
 
-    // Reproducir el sonido de descanso 2 segundos antes de que termine
     if (!isStudyTime && timeLeft <= 1 && !breakSoundPlayed) {
       breakEndSound.play();
-      breakSoundPlayed = true; // Marcar que el sonido ya se reprodujo
+      breakSoundPlayed = true; 
     }
 
     timeLeft--;

@@ -87,7 +87,6 @@
     document.getElementById('contact-form').addEventListener('submit', function (event) {
         event.preventDefault();
 
-        // Mostrar un mensaje de carga
         const submitButton = this.querySelector('button[type="submit"]');
         submitButton.disabled = true;
         submitButton.textContent = 'Enviando...';
@@ -102,20 +101,16 @@
             .then(response => response.json())
             .then(data => {
                 if (data.success) {
-                    // Mostrar un mensaje de éxito
                     alert('Gracias por tu mensaje. Nos pondremos en contacto contigo pronto.');
                     document.getElementById('contact-form').reset();
                 } else {
-                    // Mostrar un mensaje de error
                     alert('Hubo un error al enviar el mensaje: ' + (data.error || 'Inténtalo de nuevo.'));
                 }
             })
             .catch(error => {
-                // Mostrar un mensaje de error en caso de fallo en la solicitud
                 alert('Hubo un error al enviar el mensaje. Inténtalo de nuevo.');
             })
             .finally(() => {
-                // Restaurar el botón de enviar
                 submitButton.disabled = false;
                 submitButton.textContent = 'Enviar';
             });
