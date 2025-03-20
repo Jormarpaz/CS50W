@@ -27,16 +27,14 @@ In summary, this project is **distinct** because it addresses multiple needs of 
 
 ## Project Structure
 
-### Files and Their Contents
+### Main Files and Their Contents
 
 - **`README.md`**: This file, providing an overview of the project, its distinctiveness, complexity, and instructions for running it.
 - **`requirements.txt`**: Lists all Python packages required to run the application.
 - **`manage.py`**: The Django command-line utility for administrative tasks.
-- **`Capstone/`**: The main Django application directory.
+- **`fproject/`**: The main Django application directory.
   - **`settings.py`**: Configuration settings for the Django project, including database, static files, and email settings.
   - **`urls.py`**: URL routing for the entire project.
-  - **`wsgi.py`**: WSGI configuration for deployment.
-  - **`asgi.py`**: ASGI configuration for asynchronous deployment.
 - **`Capstone/templates/`**: Contains HTML templates for the application.
   - **`layout.html`**: The base template that other templates extend.
   - **`index.html`**: The homepage, displaying recent files and upcoming events.

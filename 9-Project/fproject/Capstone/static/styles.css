@@ -1,97 +1,136 @@
 /*****************************************************/
-/*
-    General styles
+/* 
+    General Styles 
 */
 /*****************************************************/
-html, body {
-  background: linear-gradient(to right, #18230F, #27391C, #255F38, #1F7D53);
-}
+html,
 body {
-  font-family: "Roboto", sans-serif;
-  /*background-color: #e0f7fa; /*#f5f5f5*/
-  color: white; /*333*/
+  background-color: #f4f4f4; /* Fondo claro */
+  font-family: Arial, sans-serif;
+  color: #333333; /* Texto principal */
   margin: 0;
   padding: 0;
 }
 
-.mt-4, .navbar-expand-lg {
-  background: linear-gradient(to right, #18230F, #27391C, #255F38, #1F7D53);
+.navbar {
+  background-color: #34495e; /* Barra de navegación oscura */
+  color: #ffffff;
+  padding: 10px 20px;
+  border-bottom: 2px solid #18230f; /* Borde inferior */
 }
 
-.mt-4 {
+.nav-item {
+  font-weight: bold;
+  font-size: 16px;
+  margin-top: 12px;
+}
+
+.container {
+  width: 80%;
+  margin: 20px auto;
+  padding: 20px;
+  background-color: #ffffff; /* Fondo blanco para el contenedor */
+  border-radius: 10px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Sombra suave */
+}
+
+.container[id="event-list-container"] {
   box-shadow: rgba(50, 50, 93, 0.25) 0px 50px 100px -20px, rgba(0, 0, 0, 0.3) 0px 30px 60px -30px, rgba(10, 37, 64, 0.35) 0px -2px 6px 0px inset !important;
 }
 
-.navbar-expand-lg {
-  border-bottom: 2px solid #18230F;
-}
-
-th, td {
-  border: 1px solid white;
-  color: white;
-}
-
-#contact-form {
-  background: linear-gradient(to right, #18230F, #27391C, #255F38, #1F7D53);
+/*****************************************************/
+/* 
+  Buttons 
+*/
+/*****************************************************/
+button {
+  background-color: #3498db; /* Azul brillante */
+  color: #ffffff;
   border: none;
-  box-shadow: rgba(50, 50, 93, 0.25) 0px 50px 100px -20px, rgba(0, 0, 0, 0.3) 0px 30px 60px -30px, rgba(10, 37, 64, 0.35) 0px -2px 6px 0px inset;
+  padding: 10px 20px;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
 }
 
-/* Container */
-.container {
-  width: 80%;
-  margin: 0 auto;
-  padding: 20px;
-  background-color: #fff;
-  border-radius: 10px;
-  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+button:hover {
+  background-color: #2980b9; /* Azul más oscuro al pasar el mouse */
+}
+
+.btn-secondary {
+  background-color: #6c757d; /* Gris para botones secundarios */
+  margin-top: 5px;
+  margin-right: 5px;
+}
+
+.btn-danger {
+  background-color: #dc3545; /* Rojo para botones de peligro */
+  margin-top: 5px;
+  padding: 5px 10px;
+  font-size: 16px;
+}
+
+.edit-event {
+  margin-top: 5px;
+  padding: 5px 10px;
+  font-size: 16px;
 }
 
 /*****************************************************/
-/*****************************************************/
-/*****************************************************/
-
-/*****************************************************/
-/*
-    Archivos
+/* 
+  Inputs and Textareas 
 */
 /*****************************************************/
+input[type="text"],
+input[type="email"],
+input[type="number"],
+textarea {
+  width: 100%;
+  padding: 10px;
+  margin: 10px 0;
+  border: 1px solid #cccccc;
+  border-radius: 4px;
+  font-size: 16px;
+}
+
+input:focus,
+textarea:focus {
+  border-color: #3498db; /* Borde azul al enfocar */
+  outline: none;
+}
 
 /*****************************************************/
-/*****************************************************/
-/*****************************************************/
-
-/*****************************************************/
-/*
-    Headings, Paragraphs, Links
+/* 
+  Headings, Paragraphs, Links 
 */
 /*****************************************************/
-
-/* Headings */
 h1,
 h2,
 h3,
 h4,
 h5,
 h6 {
-  color: white;
+  color: #333333; /* Texto oscuro para títulos */
+  margin-top: 5px;
   margin-bottom: 20px;
   font-family: "Roboto Slab", serif;
+}
+
+h3[id="faq"] {
+  margin-top: 20px;
 }
 
 h2 {
   margin-top: 10px;
 }
 
-/* Paragraphs */
 p {
   line-height: 1.6;
   margin-bottom: 20px;
 }
 
-/* Links */
 a {
-  color: #3498db;
+  color: #3498db; /* Azul para enlaces */
   text-decoration: none;
 }
 
@@ -100,66 +139,61 @@ a:hover {
 }
 
 /*****************************************************/
-/*****************************************************/
-/*****************************************************/
-
-/*****************************************************/
-/*
-    Checkboxs
+/* 
+  Lists 
 */
 /*****************************************************/
-
-/* Estilo para los contenedores de archivos y carpetas */
-.file-container,
-.folder-container,
-.subfolder-container {
-  display: flex; /* Usa flexbox para alinear elementos */
-  align-items: center; /* Centra verticalmente los elementos */
-  gap: 8px; /* Espacio entre el checkbox y el nombre */
-  white-space: nowrap; /* Evita que los elementos se rompan */
+ul,
+ol {
+  margin-bottom: 20px;
+  padding-left: 20px;
+  list-style-type: disc;
 }
 
-/* Estilo para los checkboxes */
-.delete-checkbox {
-  display: none; /* Inicialmente oculto */
-  margin: 0; /* Elimina cualquier margen */
-  padding: 0; /* Elimina cualquier padding */
+li {
+  margin-bottom: 10px;
 }
 
-/* Estilo para los checkboxes cuando están visibles */
-.delete-checkbox[style*="inline-block"] {
-  display: inline-block !important; /* Fuerza la visibilidad */
-  margin-right: 8px; /* Espacio entre el checkbox y el texto */
-}
-
-/* Estilo para los elementos <li> que contienen un checkbox visible */
-li .delete-checkbox[style*="inline-block"] {
-  display: inline-block !important; /* Fuerza la visibilidad */
-  margin-right: 8px; /* Espacio entre el checkbox y el texto */
-}
-
-/* Asegurar que los elementos <li> con checkboxes visibles usen flexbox */
-li:has(.delete-checkbox[style*="inline-block"]) {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-}
-
-.empty-message {
-  list-style-type: disc !important; /* Fuerza el marcador */
-  display: list-item !important; /* Asegura que sea tratado como <li> */
+table th, table td {
+  padding: 10px; /* Espaciado interno */
+  text-align: left; /* Alineación del texto */
+  background-color: #ffffff; /* Fondo blanco para celdas */
 }
 
 /*****************************************************/
-/*****************************************************/
-/*****************************************************/
-
-/*****************************************************/
-/*
-    Clock
+/* 
+  Calendar 
 */
 /*****************************************************/
+#calendar {
+  max-width: 100%;
+  margin: 0 auto;
+  padding: auto;
+  height: auto; /*700px*/
+}
 
+@media (max-width: 768px) {
+
+  .fc-header-toolbar {
+    flex-direction: column; /* Apila los botones en móviles */
+    align-items: flex-start;
+  }
+
+  .fc-toolbar-title {
+    font-size: 1.2em; /* Reduce el tamaño del título */
+  }
+
+  .fc-button {
+    font-size: 0.8em; /* Reduce el tamaño de los botones */
+    padding: 5px 10px;
+  }
+}
+
+/*****************************************************/
+/* 
+  Clock 
+*/
+/*****************************************************/
 #timer {
   font-size: 48px;
   font-weight: bold;
@@ -176,181 +210,85 @@ li:has(.delete-checkbox[style*="inline-block"]) {
 }
 
 /*****************************************************/
-/*****************************************************/
-/*****************************************************/
-
-/*****************************************************/
-/*
-    Buttons 
+/* 
+  Checkboxes 
 */
 /*****************************************************/
-button {
-  background-color: #3498db;
-  color: #fff;
-  border: none;
-  padding: 10px 20px;
-  border-radius: 5px;
-  cursor: pointer;
-  transition: background-color 0.3s ease;
+.file-container,
+.folder-container,
+.subfolder-container {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  white-space: nowrap;
 }
 
-button:hover {
-  background-color: #2980b9;
+.delete-checkbox {
+  display: none;
+  margin: 0;
+  padding: 0;
 }
 
-.btn-secondary {
-  margin-top: 5px;
-  margin-right: 5px;
+.delete-checkbox[style*="inline-block"] {
+  display: inline-block !important;
+  margin-right: 8px;
 }
 
-.btn-danger {
-  margin-top: 5px;
-  padding: 5px 10px;
-  font-size: 16px;
+li .delete-checkbox[style*="inline-block"] {
+  display: inline-block !important;
+  margin-right: 8px;
 }
 
-/* Estilo para los botones */
-.btn-secondary,
-.btn-danger {
-  margin-top: 5px;
-  margin-right: 5px;
+li:has(.delete-checkbox[style*="inline-block"]) {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.empty-message {
+  list-style-type: disc !important;
+  display: list-item !important;
 }
 
 /*****************************************************/
+/* 
+  Contact Form 
+*/
 /*****************************************************/
-/*****************************************************/
+#contact-form {
+  background: #ffffff; /* Fondo blanco */
+  border: 1px solid #cccccc; /* Borde gris */
+  padding: 20px; /* Espaciado interno */
+  border-radius: 8px; /* Bordes redondeados */
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Sombra suave */
+}
+
 
 /*****************************************************/
-/*
-    Calendar
+/* 
+  Moviles 
 */
 /*****************************************************/
 
-#calendar {
-  max-width: 100%;
-  margin: 0 auto;
-  padding: auto;
-  height: 700px;
-}
-
-form {
-  position: relative; /* Change to relative */
-  margin: 20px auto; /* Center the form horizontally */
-  background-color: white;
-  padding: 20px;
-  border: 1px solid #ccc;
-  border-radius: 5px;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-}
-
-.form-group {
-  margin-bottom: 15px;
-}
-
-.form-control {
+.table-responsive {
   width: 100%;
-  padding: 10px;
-  margin-bottom: 10px;
-  border: 1px solid #ccc;
-  border-radius: 4px;
+  overflow-x: auto; /* Permite el desplazamiento horizontal */
+  -webkit-overflow-scrolling: touch; /* Mejora el desplazamiento en dispositivos táctiles */
 }
 
-.btn-primary {
-  background-color: #007bff;
-  color: white;
-  border: none;
-  padding: 10px 20px;
-  border-radius: 4px;
-  cursor: pointer;
+.table-responsive table {
+  min-width: 600px; /* Ancho mínimo para la tabla */
+  width: 100%;
 }
 
-.btn-primary:hover {
-  background-color: #0056b3;
-}
+@media (max-width: 768px) {
+  .table-responsive table {
+    min-width: 100%; /* Ajusta el ancho de la tabla al 100% en móviles */
+  }
 
-.input-no-outline:focus {
-  outline: none;
-  box-shadow: none;
-}
-
-a[id="editar"] {
-  &:hover {
-    text-decoration: underline;
-    color: blue;
+  .table-responsive th,
+  .table-responsive td {
+    white-space: nowrap; /* Evita que el texto se divida en varias líneas */
+    padding: 8px; /* Reduce el padding para ahorrar espacio */
   }
 }
-
-/*****************************************************/
-/*****************************************************/
-/*****************************************************/
-
-/*****************************************************/
-/*
-    Inputs y Textareas
-*/
-/*****************************************************/
-input,
-textarea {
-  width: 100%;
-  padding: 10px;
-  margin-bottom: 20px;
-  border: 1px solid #ccc;
-  border-radius: 5px;
-}
-
-input:focus,
-textarea:focus {
-  border-color: #3498db;
-  outline: none;
-}
-
-/*****************************************************/
-/*****************************************************/
-/*****************************************************/
-
-/*****************************************************/
-/*
-    Listas
-*/
-/*****************************************************/
-ul,
-ol {
-  margin-bottom: 20px;
-  padding-left: 20px;
-  list-style-type: disc;
-}
-
-li {
-  margin-bottom: 10px;
-}
-
-/*****************************************************/
-/*****************************************************/
-/*****************************************************/
-
-/*****************************************************/
-/*
-    Navegación
-*/
-/*****************************************************/
-
-/*
-nav {
-  background-color: #2c3e50;
-  padding: 10px;
-  border-radius: 5px;
-}
-
-nav a {
-  color: #ecf0f1;
-  margin: 0 10px;
-}
-
-nav a:hover {
-  color: #3498db;
-}
-
-*/
-/*****************************************************/
-/*****************************************************/
-/*****************************************************/
